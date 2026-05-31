@@ -52,5 +52,5 @@ app.include_router(query.router,  prefix="/api/v1", tags=["query"])
 
 @app.get("/health", tags=["health"])
 async def health():
-    '''Heakth'''
+    '''Health'''
     return {"status": "ok", "service": settings.APP_NAME, "env": settings.APP_ENV}

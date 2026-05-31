@@ -31,6 +31,8 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
 
+    LLM_SERVICE_URL: str = "http://localhost:8002"
+
     model_config = ConfigDict(env_file=".env", case_sensitive=True)
 
     # class Config:
