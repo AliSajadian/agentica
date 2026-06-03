@@ -4,6 +4,20 @@ services:
 
   # ── Infrastructure ───────────────────────────────────────────────────────────
 
+  postgres:
+    image: postgres:16-alpine
+    container_name: agentica-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: agentica_memory
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - agentica-network
+
   qdrant:
     image: qdrant/qdrant
     container_name: agentica-qdrant
@@ -151,6 +165,7 @@ services:
 # ── Volumes ───────────────────────────────────────────────────────────────────
 
 volumes:
+  postgres:
   qdrant_data:
   # redis_data:
   # rabbitmq_data:
