@@ -46,7 +46,7 @@ class SessionCreate(BaseModel):
 class SessionResponse(BaseModel):
     """Schema for returning a session."""
     id: UUID
-    user_id: str
+    user_id: UUID
     title: Optional[str] = None
     created_at: datetime
     updated_at: datetime

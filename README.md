@@ -274,7 +274,7 @@ pytest tests/ -v
 - [x] RAG Service
 - [x] LLM Service
 - [x] Docker Compose
-- [ ] Memory Service
+- [x] Memory Service
 - [ ] Agent Service (LangGraph)
 - [ ] Gateway Service
 

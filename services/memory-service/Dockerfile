@@ -15,6 +15,10 @@ COPY . .
 RUN adduser --disabled-password --gecos "" appuser
 USER appuser
 
-EXPOSE 8003
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003"]
+CMD ["./entrypoint.sh"]
+# EXPOSE 8003
+
+# CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8003"]

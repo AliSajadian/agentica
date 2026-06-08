@@ -17,6 +17,12 @@ services:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - agentica-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agentica_memory"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
 
   qdrant:
     image: qdrant/qdrant
@@ -36,20 +42,21 @@ services:
       retries: 5
       start_period: 20s
 
-  # redis:
-  #   image: redis:7-alpine
-  #   container_name: agentica-redis
-  #   ports:
-  #     - "6379:6379"
-  #   volumes:
-  #     - redis_data:/data
-  #   networks:
-  #     - agentica-network
-  #   healthcheck:
-  #     test: ["CMD", "redis-cli", "ping"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
+  redis:
+    image: redis:7-alpine
+    container_name: agentica-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - agentica-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
 
   # rabbitmq:
   #   image: rabbitmq:3-management-alpine
@@ -162,12 +169,42 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  memory-service:
+    build:
+      context: ./services/memory-service
+      dockerfile: Dockerfile
+    container_name: agentica-memory-service
+    ports:
+      - "8003:8003"
+    environment:
+      APP_ENV: development
+      APP_PORT: 8003
+      DATABASE_URL: postgresql+asyncpg://postgres:admin@postgres:5432/agentica_memory
+      REDIS_URL: redis://redis:6379/0      
+      LOG_LEVEL: INFO
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - agentica-network
+    volumes:
+      - ./services/memory-service:/app
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8003/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
 # ── Volumes ───────────────────────────────────────────────────────────────────
 
 volumes:
-  postgres:
+  postgres_data:
   qdrant_data:
-  # redis_data:
+  redis_data:
   # rabbitmq_data:
   ollama_data:
 
