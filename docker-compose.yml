@@ -199,6 +199,79 @@ services:
       start_period: 30s
     restart: unless-stopped
 
+  agent-service:
+    build:
+      context: ./services/agent-service
+      dockerfile: Dockerfile
+    container_name: agentica-agent-service
+    ports:
+      - "8004:8004"
+    environment:
+      APP_ENV: development
+      APP_PORT: 8004
+      LOG_LEVEL: INFO
+      RAG_SERVICE_URL: http://rag-service:8001
+      LLM_SERVICE_URL: http://llm-service:8002
+      MEMORY_SERVICE_URL: http://memory-service:8003
+      HTTP_TIMEOUT: 30
+      HTTP_MAX_RETRIES: 3
+    depends_on:
+      - rag-service
+      - llm-service
+      - memory-service
+    networks:
+      - agentica-network
+    volumes:
+      - ./services/agent-service:/app
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8004/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
+  gateway-service:
+    build:
+      context: ./services/gateway-service
+      dockerfile: Dockerfile
+    container_name: agentica-gateway-service
+    ports:
+      - "8000:8000"
+    environment:
+      APP_ENV: development
+      APP_PORT: 8000
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: agentica_gateway
+      DATABASE_URL: postgresql+asyncpg://postgres:admin@postgres:5432/agentica_gateway
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 1
+      JWT_SECRET_KEY: your-super-secret-key-change-in-production
+      RAG_SERVICE_URL: http://rag-service:8001
+      LLM_SERVICE_URL: http://llm-service:8002
+      MEMORY_SERVICE_URL: http://memory-service:8003
+      AGENT_SERVICE_URL: http://agent-service:8004
+      LOG_LEVEL: INFO
+    depends_on:
+      - postgres
+      - redis
+      - rag-service
+      - llm-service
+      - memory-service
+    networks:
+      - agentica-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    restart: unless-stopped
+
 # ── Volumes ───────────────────────────────────────────────────────────────────
 
 volumes:

@@ -19,6 +19,10 @@ class RedisCache:
             db=settings.REDIS_DB,
             decode_responses=True
         )
+        # self.client = aioredis.from_url(
+        #     settings.REDIS_URL,
+        #     decode_responses=True
+        # )
         self.ttl = settings.REDIS_TTL
 
     async def get(self, key: str) -> dict | None:

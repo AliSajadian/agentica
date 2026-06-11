@@ -12,12 +12,9 @@ RUN pip install --no-cache-dir --upgrade pip && \
 
 COPY . .
 
-COPY entrypoint.sh .
-RUN chmod +x entrypoint.sh
-
 RUN adduser --disabled-password --gecos "" appuser
 USER appuser
 
-EXPOSE 8003
+EXPOSE 8004
 
-CMD ["./entrypoint.sh"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8004"]

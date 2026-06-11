@@ -14,15 +14,16 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # PostgreSQL
-    POSTGRES_HOST: str = "localhost"
+    POSTGRES_HOST: str = "postgres"
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str = "agentica"
     POSTGRES_PASSWORD: str = "agentica"
     POSTGRES_DB: str = "agentica_memory"
-    DATABASE_URL: str = "postgresql+asyncpg://agentica:agentica@localhost:5432/agentica_memory"
+    DATABASE_URL: str = "postgresql+asyncpg://agentica:agentica@postgres:5432/agentica_memory"
 
     # Redis
-    REDIS_HOST: str = "localhost"
+    REDIS_URL: str = "redis://redis:6379/0"
+    REDIS_HOST: str = "redis"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
     REDIS_TTL: int = 3600
