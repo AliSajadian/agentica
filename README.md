@@ -275,8 +275,8 @@ pytest tests/ -v
 - [x] LLM Service
 - [x] Docker Compose
 - [x] Memory Service
-- [ ] Agent Service (LangGraph)
-- [ ] Gateway Service
+- [x] Agent Service (LangGraph)
+- [x] Gateway Service
 
 ### Phase 2 — Domain Agents
 - [ ] Weather Agent
