@@ -101,7 +101,7 @@ services:
 
   rag-service:
     build:
-      context: ./services/rag-service
+      context: ./services/core/rag-service
       dockerfile: Dockerfile
     container_name: agentica-rag-service
     ports:
@@ -137,7 +137,7 @@ services:
 
   llm-service:
     build:
-      context: ./services/llm-service
+      context: ./services/core/llm-service
       dockerfile: Dockerfile
     container_name: agentica-llm-service
     ports:
@@ -171,7 +171,7 @@ services:
 
   memory-service:
     build:
-      context: ./services/memory-service
+      context: ./services/core/memory-service
       dockerfile: Dockerfile
     container_name: agentica-memory-service
     ports:
@@ -201,7 +201,7 @@ services:
 
   agent-service:
     build:
-      context: ./services/agent-service
+      context: ./services/core/agent-service
       dockerfile: Dockerfile
     container_name: agentica-agent-service
     ports:
@@ -233,7 +233,7 @@ services:
 
   gateway-service:
     build:
-      context: ./services/gateway-service
+      context: ./services/core/gateway-service
       dockerfile: Dockerfile
     container_name: agentica-gateway-service
     ports:
@@ -270,6 +270,33 @@ services:
       timeout: 10s
       retries: 3
       start_period: 30s
+    restart: unless-stopped
+
+  weather-agent:
+    build:
+      context: ./services/agents/weather-agent
+      dockerfile: Dockerfile
+    container_name: agentica-weather-agent
+    ports:
+      - "8011:8011"
+    environment:
+      APP_ENV: development
+      APP_PORT: 8011
+      OPENWEATHER_API_KEY: abcd
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 2
+      LOG_LEVEL: INFO
+    depends_on:
+      - redis
+    networks:
+      - agentica-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:8011/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
     restart: unless-stopped
 
 # ── Volumes ───────────────────────────────────────────────────────────────────

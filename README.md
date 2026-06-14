@@ -279,7 +279,7 @@ pytest tests/ -v
 - [x] Gateway Service
 
 ### Phase 2 — Domain Agents
-- [ ] Weather Agent
+- [x] Weather Agent
 - [ ] Search Agent
 - [ ] Travel Agent
 - [ ] Finance Agent
