@@ -1,6 +1,8 @@
 '''Main'''
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from prometheus_fastapi_instrumentator import Instrumentator
+
 from app.config import settings
 from app.utils.logger import setup_logging, get_logger
 from app.api.v1.routes import agents as agent_router
@@ -26,6 +28,8 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
+
+Instrumentator().instrument(app).expose(app)
 
 app.include_router(agent_router.router, prefix="/api/v1/agent", tags=["agent"])
 

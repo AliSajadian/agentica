@@ -29,6 +29,8 @@ onnxruntime==1.26.0
 packaging==26.2
 pillow==12.2.0
 portalocker==3.2.0
+prometheus-client==0.17.1
+prometheus-fastapi-instrumentator==5.7.1
 protobuf==7.35.0
 py_rust_stemmers==0.1.8
 pydantic==2.13.4

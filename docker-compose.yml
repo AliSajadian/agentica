@@ -97,6 +97,50 @@ services:
     #           capabilities: [gpu]
     # ──────────────────────────────────────────────────────────────────────
 
+  prometheus:
+    image: prom/prometheus
+    container_name: agentica-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./infra/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.enable-lifecycle"
+    networks:
+      - agentica-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:9090/-/healthy || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana
+    container_name: agentica-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: agentica
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./infra/grafana/provisioning:/etc/grafana/provisioning
+    depends_on:
+      - prometheus
+    networks:
+      - agentica-network
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+    
   # ── Services ─────────────────────────────────────────────────────────────────
 
   rag-service:
@@ -126,9 +170,9 @@ services:
     networks:
       - agentica-network
     volumes:
-      - ./services/rag-service:/app
+      - ./services/core/rag-service:/app
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8001/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8001/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -160,9 +204,9 @@ services:
     networks:
       - agentica-network
     volumes:
-      - ./services/llm-service:/app
+      - ./services/core/llm-service:/app
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8002/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8002/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -190,9 +234,9 @@ services:
     networks:
       - agentica-network
     volumes:
-      - ./services/memory-service:/app
+      - ./services/core/memory-service:/app
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8003/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8003/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -222,9 +266,9 @@ services:
     networks:
       - agentica-network
     volumes:
-      - ./services/agent-service:/app
+      - ./services/core/agent-service:/app
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8004/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8004/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -265,12 +309,14 @@ services:
     networks:
       - agentica-network
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8000/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 30s
     restart: unless-stopped
+
+  # ── Agents ─────────────────────────────────────────────────────────────────
 
   weather-agent:
     build:
@@ -292,12 +338,41 @@ services:
     networks:
       - agentica-network
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8011/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8011/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
     restart: unless-stopped
+
+  search-agent:
+    build:
+      context: ./services/agents/search-agent
+      dockerfile: Dockerfile
+    container_name: agentica-search-agent
+    ports:
+      - "8012:8012"
+    environment:
+      APP_ENV: development
+      APP_PORT: 8012
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_DB: 3
+      LOG_LEVEL: INFO
+    depends_on:
+      - redis
+    networks:
+      - agentica-network
+    volumes:
+    - ./services/agents/search-agent/secrets:/home/ali/projects/AI/agentica/services/agents/search-agent/secrets
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8012/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
 
 # ── Volumes ───────────────────────────────────────────────────────────────────
 
@@ -307,6 +382,8 @@ volumes:
   redis_data:
   # rabbitmq_data:
   ollama_data:
+  prometheus_data:
+  grafana_data:
 
 # ── Networks ──────────────────────────────────────────────────────────────────
 

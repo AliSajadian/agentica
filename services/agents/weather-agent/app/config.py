@@ -1,4 +1,4 @@
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings #, SettingsConfigDict
 from pydantic import ConfigDict
 from functools import lru_cache
 
@@ -13,13 +13,13 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # OpenWeatherMap
-    OPENWEATHER_API_KEY: str = "your-openweathermap-api-key"
+    OPENWEATHER_API_KEY: str = "abcd"
     OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
     OPENWEATHER_UNITS: str = "metric"
     OPENWEATHER_LANG: str = "en"
 
     # Redis Cache
-    REDIS_HOST: str = "localhost"
+    REDIS_HOST: str = "redis"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 2
     WEATHER_CACHE_TTL: int = 1800
@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     model_config = ConfigDict(env_file=".env", case_sensitive=True)
-
+    # model_config = SettingsConfigDict(env_file='.env', env_file_encoding="utf-8", extra='ignore')
 
 @lru_cache()
 def get_settings() -> Settings:

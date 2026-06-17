@@ -5,6 +5,8 @@ WORKDIR /app
 # install only ca-certificates for HTTPS requests
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
+    wget \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # install dependencies first (layer caching — only rebuilds if requirements.txt changes)

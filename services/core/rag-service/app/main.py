@@ -2,6 +2,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.config import settings
 from app.utils.logger import setup_logging, get_logger
@@ -35,6 +36,8 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
 )
+
+Instrumentator().instrument(app).expose(app)
 
 app.add_middleware(
     CORSMiddleware,
