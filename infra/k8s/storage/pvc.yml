@@ -1,0 +1,148 @@
+# For Memory Service PostgreSQL
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-memory-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+  storageClassName: standard
+
+---
+# For Gateway Service PostgreSQL
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: postgres-gateway-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+  storageClassName: standard
+
+---
+# For Qdrant (RAG Service)
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: qdrant-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: standard
+
+---
+# For Redis Memory
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-memory-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+  storageClassName: standard
+
+---
+# For Redis Gateway
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-gateway-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+  storageClassName: standard
+
+---
+# For Redis Weather
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-weather-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+  storageClassName: standard
+
+---
+# For Redis Search
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-search-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+  storageClassName: standard
+
+---
+# For Ollama Models
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ollama-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+  storageClassName: standard
+
+---
+# For Prometheus
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
+  storageClassName: standard
+
+---
+# For Grafana
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+  storageClassName: standard

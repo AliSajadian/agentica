@@ -1,0 +1,14 @@
+# Service for Memory Service PostgreSQL
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgresql-memory-svc
+  namespace: agentica-app
+spec:
+  selector:
+    app: postgres-memory # Matches the StatefulSet's labels
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
+  clusterIP: None # Headless service for StatefulSet

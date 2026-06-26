@@ -1,0 +1,73 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: agentica-app
+data:
+  # ── General ────────────────────────────────────────────────────────────────
+  APP_ENV: "development"
+  LOG_LEVEL: "INFO"
+
+  # ── PostgreSQL ─────────────────────────────────────────────────────────────
+  # POSTGRES_HOST: postgres-memory-svc
+  # POSTGRES_PORT: "5432"
+  # POSTGRES_USER: "postgres"
+  # POSTGRES_DB_MEMORY: "agentica_memory"
+  # POSTGRES_DB_GATEWAY: "agentica_gateway"
+  # DATABASE_URL_MEMORY: "postgresql+asyncpg://postgres:admin@postgres-memory-svc:5432/agentica_memory"
+  # DATABASE_URL_GATEWAY: "postgresql+asyncpg://postgres:admin@postgres-memory-svc:5432/agentica_gateway"
+
+  # ── Redis ──────────────────────────────────────────────────────────────────
+  # REDIS_HOST: redis-public-svc
+  # REDIS_PORT: "6379"
+  # REDIS_DB_MEMORY: "0"
+  # REDIS_DB_GATEWAY: "1"
+  # REDIS_DB_WEATHER: "2"
+  # REDIS_DB_SEARCH: "3"
+
+  # ── Ollama ─────────────────────────────────────────────────────────────────
+  # OLLAMA_HOST: ollama-svc
+  # OLLAMA_PORT: "11434"
+  # OLLAMA_MODEL: "llama3.2:3b"
+  # OLLAMA_TIMEOUT: "120"
+  # MAX_TOKENS: "1024"
+  # TEMPERATURE: "0.7"
+  # TOP_P: "0.9"
+  # STREAM: "true"
+
+  # ── RabbitMQ (optional) ────────────────────────────────────────────────────
+  # RABBITMQ_HOST: rabbitmq-svc
+  # RABBITMQ_PORT: "5672"
+  # RABBITMQ_USER: "guest"
+  # RABBITMQ_URL: "amqp://guest:guest@rabbitmq-svc:5672/"
+  # USER_EVENTS_EXCHANGE_NAME: "user.events"
+
+  # ── Services URLs ──────────────────────────────────────────────────────────
+  RAG_SERVICE_URL: "http://rag-svc:8001"
+  LLM_SERVICE_URL: "http://llm-svc:8002"
+  MEMORY_SERVICE_URL: "http://memory-svc:8003"
+  AGENT_SERVICE_URL: "http://agent-svc:8004"
+  GATEWAY_SERVICE_URL: "http://gateway-svc:8000"
+
+  # ── Service Ports ──────────────────────────────────────────────────────────
+  LLM_PORT: "8002"
+  MEMORY_PORT: "8003"
+  AGENT_PORT: "8004"
+  GATEWAY_PORT: "8000"
+  WEATHER_PORT: "8011"
+  SEARCH_PORT: "8012"
+
+  # ── Agent Specific ─────────────────────────────────────────────────────────
+  # HTTP_TIMEOUT: "30"
+  # HTTP_MAX_RETRIES: "3"
+
+  # ── Embedding ──────────────────────────────────────────────────────────────
+  EMBEDDING_MODEL: "BAAI/bge-small-en-v1.5"
+  EMBEDDING_DEVICE: "cpu"
+  CHUNK_SIZE: "512"
+  CHUNK_OVERLAP: "50"
+
+  # ── JWT ────────────────────────────────────────────────────────────────────
+  ALGORITHM: "HS256"
+  ACCESS_TOKEN_EXPIRE_MINUTES: "30"
+  REFRESH_EXPIRE_DAYS: "40"

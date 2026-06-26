@@ -18,7 +18,7 @@ scrape_configs:
 
   - job_name: "agent-service"
     static_configs:
-      - targets: ["memory-service:8004"]
+      - targets: ["agent-service:8004"]
 
   - job_name: "gateway-service"
     static_configs:
@@ -31,3 +31,25 @@ scrape_configs:
   - job_name: "search-agent"
     static_configs:
       - targets: ["search-agent:8012"]
+
+  - job_name: 'blackbox-http'
+    metrics_path: /probe
+    params:
+      module: [http_2xx]
+    static_configs:
+      - targets:
+        - http://gateway-service:8000/health
+        - http://llm-service:8002/health
+        - http://rag-service:8001/health
+        - http://memory-service:8003/health
+        - http://agent-service:8004/health
+        - http://weather-agent:8011/health
+        - http://search-agent:8012/health
+        - https://github.com    
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: blackbox-exporter:9115

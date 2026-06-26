@@ -1,0 +1,19 @@
+# Service for Memory Service (HTTP & gRPC)
+apiVersion: v1
+kind: Service
+metadata:
+  name: memory-service-svc
+  namespace: agentica-app
+spec:
+  selector:
+    app: memory-service
+  ports:
+    - name: http-api
+      protocol: TCP
+      port: 8003 # Internal service port for HTTP
+      targetPort: 8003 # Container's HTTP port
+    # - name: grpc-api
+    #   protocol: TCP
+    #   port: 50052
+    #   targetPort: 50052
+  type: ClusterIP

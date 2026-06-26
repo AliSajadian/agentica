@@ -19,7 +19,7 @@ class Settings(BaseSettings):
     OPENWEATHER_LANG: str = "en"
 
     # Redis Cache
-    REDIS_HOST: str = "redis"
+    REDIS_HOST: str = "redis-weather"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 2
     WEATHER_CACHE_TTL: int = 1800
@@ -27,7 +27,7 @@ class Settings(BaseSettings):
     # Logging
     LOG_LEVEL: str = "INFO"
 
-    model_config = ConfigDict(env_file=".env", case_sensitive=True)
+    model_config = ConfigDict(env_file=".env.docker", case_sensitive=True)
     # model_config = SettingsConfigDict(env_file='.env', env_file_encoding="utf-8", extra='ignore')
 
 @lru_cache()

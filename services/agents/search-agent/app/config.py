@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     DUCKDUCKGO_BASE_URL: str = "https://api.duckduckgo.com"
 
     # Redis Cache
-    REDIS_HOST: str = "redis"
+    REDIS_HOST: str = "redis-search"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 3
     SEARCH_CACHE_TTL: int = 300
@@ -41,7 +41,7 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = "INFO"
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=".env.docker",
         # secrets_dir=Path(__file__).parent.parent / "secrets", 
         secrets_dir="/home/ali/projects/AI/agentica/services/agents/search-agent/secrets",
         # secrets_dir="/app/secrets",

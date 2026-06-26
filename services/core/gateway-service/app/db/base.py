@@ -15,7 +15,8 @@ engine = create_async_engine(
     echo=settings.DEBUG,
     pool_size=10,
     max_overflow=20,
-    pool_pre_ping=True
+    pool_pre_ping=True,
+    connect_args={"ssl": False},
 )
 
 # async session factory

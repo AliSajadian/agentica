@@ -1,0 +1,13 @@
+# Grafana Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: grafana-svc
+  namespace: agentica-app
+spec:
+  selector:
+    app: grafana
+  ports:
+    - port: 3000
+      targetPort: 3000
+  type: ClusterIP

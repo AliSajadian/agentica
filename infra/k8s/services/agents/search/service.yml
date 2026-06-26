@@ -1,0 +1,19 @@
+# Service for Search Service (HTTP & gRPC)
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-service-svc
+  namespace: agentica-app
+spec:
+  selector:
+    app: search-service
+  ports:
+    - name: http-api
+      protocol: TCP
+      port: 8012 # Internal service port for HTTP
+      targetPort: 8012 # Container's HTTP port
+    # - name: grpc-api
+    #   protocol: TCP
+    #   port: 50052
+    #   targetPort: 50052
+  type: ClusterIP

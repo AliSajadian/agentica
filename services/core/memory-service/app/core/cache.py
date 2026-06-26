@@ -13,22 +13,29 @@ class RedisCache:
 
     def __init__(self):
         """Initialize Redis connection."""
-        self.client = aioredis.Redis(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            db=settings.REDIS_DB,
-            decode_responses=True
-        )
+        self.client = None
         # self.client = aioredis.from_url(
         #     settings.REDIS_URL,
         #     decode_responses=True
         # )
-        self.ttl = settings.REDIS_TTL
+        self.ttl = None
+
+    def _get_client(self):
+        if self.client is None:
+            self.client = aioredis.Redis(
+                host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB,
+                password=settings.REDIS_PASSWORD or None,
+                decode_responses=True
+            )
+            self.ttl = settings.REDIS_TTL
+        return self.client
 
     async def get(self, key: str) -> dict | None:
         """Retrieve a cached value by key."""
         try:
-            value = await self.client.get(key)
+            value = await self._get_client().get(key)
             if value:
                 logger.info("cache_hit", key=key)
                 return json.loads(value)
@@ -41,7 +48,7 @@ class RedisCache:
     async def set(self, key: str, value: dict, ttl: int = None) -> bool:
         """Store a value in cache with optional TTL."""
         try:
-            await self.client.setex(
+            await self._get_client().setex(
                 key,
                 ttl or self.ttl,
                 json.dumps(value)
@@ -55,7 +62,7 @@ class RedisCache:
     async def delete(self, key: str) -> bool:
         """Delete a cached value by key."""
         try:
-            await self.client.delete(key)
+            await self._get_client().delete(key)
             logger.info("cache_deleted", key=key)
             return True
         except Exception as e:
@@ -65,7 +72,7 @@ class RedisCache:
     async def exists(self, key: str) -> bool:
         """Check if a key exists in cache."""
         try:
-            return bool(await self.client.exists(key))
+            return bool(await self._get_client().exists(key))
         except Exception as e:
             logger.error("cache_exists_failed", key=key, error=str(e))
             return False
@@ -73,7 +80,7 @@ class RedisCache:
     async def health(self) -> bool:
         """Check Redis connection health."""
         try:
-            await self.client.ping()
+            await self._get_client().ping()
             return True
         except Exception:
             return False

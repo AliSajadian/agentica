@@ -280,15 +280,15 @@ pytest tests/ -v
 
 ### Phase 2 — Domain Agents
 - [x] Weather Agent
-- [ ] Search Agent
+- [x] Search Agent
 - [ ] Travel Agent
 - [ ] Finance Agent
 - [ ] News Agent
 
 ### Phase 3 — Production
 - [ ] Auth Service (JWT + OAuth2)
-- [ ] Kubernetes manifests (k3s)
-- [ ] Prometheus + Grafana observability
+- [x] Kubernetes manifests (k3s)
+- [x] Prometheus + Grafana observability
 - [ ] gRPC inter-service communication
 - [ ] Calendar Agent
 - [ ] Maps Agent

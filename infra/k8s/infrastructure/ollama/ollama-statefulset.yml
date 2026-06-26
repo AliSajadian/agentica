@@ -1,0 +1,59 @@
+# Ollama StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ollama-ss
+  namespace: agentica-app
+spec:
+  serviceName: "ollama-svc"  # Must match the headless service name
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ollama
+  template:
+    metadata:
+      labels:
+        app: ollama
+    spec:
+      initContainers:
+        - name: pull-models
+          image: ollama/ollama:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              ollama pull llama3.2:3b
+              ollama pull nomic-embed-text  # Optional: add other models
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama
+      containers:
+        - name: ollama
+          image: ollama/ollama:latest
+          env:
+            - name: OLLAMA_HOST
+              value: "0.0.0.0"  # Listen on all interfaces for API access [citation:9]
+            # Optional: Set a custom path for model storage if needed
+            # - name: OLLAMA_MODELS
+            #   value: /root/.ollama/models
+          ports:
+            - containerPort: 11434
+              name: http
+          volumeMounts:
+            - name: ollama-data
+              mountPath: /root/.ollama  # Default path where Ollama stores models
+          resources:
+            requests:
+              memory: "200Mi"   # Adjust based on your model size and needs [citation:1]
+              cpu: "200m"
+            limits:
+              memory: "800Mi"
+              cpu: "500m"
+  volumeClaimTemplates:
+    - metadata:
+        name: ollama-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 2Gi  # Adjust for your expected model sizes (e.g., llama3.1:8b is ~4.7GB) [citation:1]

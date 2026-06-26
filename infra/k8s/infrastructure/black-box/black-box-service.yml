@@ -1,0 +1,13 @@
+# Blackbox Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: blackbox-svc
+  namespace: agentica-app
+spec:
+  selector:
+    app: blackbox
+  ports:
+    - port: 9115
+      targetPort: 9115
+  clusterIP: None  # Headless service

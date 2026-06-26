@@ -1,0 +1,61 @@
+
+# Rag Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rag-service-deploy
+  namespace: agentica-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rag-service
+  template:
+    metadata:
+      labels:
+        app: rag-service
+    spec:
+      containers:
+        - name: rag-service
+          image: agentica-rag-service:latest # Replace with your image
+          imagePullPolicy: Never
+          ports:
+            - name: http-api
+              containerPort: 8001 # Your FastAPI HTTP port
+            # - name: grpc-api
+            #   containerPort: 50052 # Your gRPC port
+          env:
+            - name: APP_PORT
+              value: "8001"
+            - name: QDRANT_HOST
+              value: qdrant-svc.agentica-app.svc.cluster.local
+            - name: QDRANT_PORT
+              value: "6333"
+            - name: QDRANT_COLLECTION
+              value: "agentica"
+            - name: LLM_SERVICE_URL
+              value: http://llm-service:8002
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "100m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http-api
+            initialDelaySeconds: 10
+            periodSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-api
+            initialDelaySeconds: 15
+            periodSeconds: 5

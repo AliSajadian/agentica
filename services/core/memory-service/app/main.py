@@ -1,5 +1,6 @@
 '''Main'''
 from fastapi import FastAPI
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from prometheus_fastapi_instrumentator import Instrumentator
@@ -58,14 +59,62 @@ app.add_middleware(
 
 register_routers(app)
 
-
 @app.get("/health", tags=["health"])
 async def health():
-    """Health check endpoint."""
-    redis_ok = await redis_cache.health()
+    """Health check including upstream service status."""
+    # redis_ok = await rate_limiter.health()
+    # upstream = await proxy_service.health_check_all()
     return {
         "status": "ok",
         "service": settings.APP_NAME,
         "env": settings.APP_ENV,
-        "redis": "connected" if redis_ok else "unreachable",
+        # "redis": "connected" if redis_ok else "unreachable",
+        # "upstream": upstream
     }
+
+@app.get("/ready", tags=["health"])
+async def ready():
+    """Readiness check including database and Redis connectivity."""
+    try:
+        # Check database connectivity
+        db_ok = await check_database_health()
+        
+        # Check Redis connectivity (reuse existing health check)
+        redis_ok = await redis_cache.health()
+        
+        # Check if all critical services are ready
+        all_ready = db_ok and redis_ok
+        
+        status_code = 200 if all_ready else 503
+        return JSONResponse(
+            status_code=status_code,
+            content={
+                "status": "ready" if all_ready else "not_ready",
+                "service": settings.APP_NAME,
+                "database": "connected" if db_ok else "unreachable",
+                "redis": "connected" if redis_ok else "unreachable",
+                "env": settings.APP_ENV
+            }
+        )
+    except Exception as e:
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "not_ready",
+                "service": settings.APP_NAME,
+                "error": str(e)
+            }
+        )
+
+async def check_database_health():
+    """Check if the database is reachable."""
+    try:
+        # Import your database session
+        from sqlalchemy import text
+        from app.db.base import AsyncSessionLocal
+        async with AsyncSessionLocal() as session:
+            # Simple query to check connection
+            await session.execute(text("SELECT 1"))
+        return True
+    except Exception:
+        return False

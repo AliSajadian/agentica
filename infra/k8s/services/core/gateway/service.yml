@@ -1,0 +1,19 @@
+# Service for Gateway Service (HTTP & gRPC)
+apiVersion: v1
+kind: Service
+metadata:
+  name: gateway-service-svc
+  namespace: agentica-app
+spec:
+  selector:
+    app: gateway-service
+  ports:
+    - name: http-api
+      protocol: TCP
+      port: 8000 # Internal service port for HTTP
+      targetPort: 8000 # Container's HTTP port
+    # - name: grpc-api
+    #   protocol: TCP
+    #   port: 50052
+    #   targetPort: 50052
+  type: ClusterIP

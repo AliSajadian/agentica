@@ -1,0 +1,74 @@
+
+# Rag Service Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-service-deploy
+  namespace: agentica-app
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: gateway-service
+  template:
+    metadata:
+      labels:
+        app: gateway-service
+    spec:
+      containers:
+        - name: gateway-service
+          image: agentica-gateway-service:latest # Replace with your image
+          imagePullPolicy: Never
+          ports:
+            - name: http-api
+              containerPort: 8000 # Your FastAPI HTTP port
+            # - name: grpc-api
+            #   containerPort: 50052 # Your gRPC port
+          env:
+            - name: APP_PORT
+              value: "8000"
+            - name: POSTGRES_HOST
+              value: postgresql-gateway-svc
+            - name: POSTGRES_PORT
+              value: "5432"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_DB
+              value: "agentica_gateway"
+            - name: DATABASE_URL
+              value: "postgresql+asyncpg://postgres:admin@postgresql-gateway-svc.agentica-app.svc.cluster.local:5432/agentica_gateway?ssl=disable"
+            - name: REDIS_HOST
+              value: "redis-gateway-svc.agentica-app.svc.cluster.local"
+            - name: REDIS_PORT
+              value: "6379"
+            - name: REDIS_DB
+              value: "0"
+          envFrom:
+            - configMapRef:
+                name: app-config
+            - secretRef:
+                name: app-secrets
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "200m"
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http-api
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: http-api
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5

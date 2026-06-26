@@ -1,0 +1,50 @@
+# PostgreSQL for Auth Service
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres-gateway-ss
+  namespace: agentica-app
+spec:
+  serviceName: "postgresql-gateway-svc" # Must match the service name
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres-gateway
+  template:
+    metadata:
+      labels:
+        app: postgres-gateway
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:16-alpine # Use a specific version
+          env:
+            - name: POSTGRES_DB
+              value: "agentica_gateway"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: POSTGRES_GATEWAY_PASSWORD
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - name: postgres-gateway-storage
+              mountPath: /var/lib/postgresql/data
+          resources: # Crucial for your 16GB RAM
+            requests:
+              memory: "64Mi"
+              cpu: "200m"
+            limits:
+              memory: "124Mi"
+              cpu: "400m"
+  volumeClaimTemplates: # This links to the PVC
+    - metadata:
+        name: postgres-gateway-storage
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 200Mi

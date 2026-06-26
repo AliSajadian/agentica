@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # Ollama
-    OLLAMA_HOST: str = "localhost"
+    OLLAMA_HOST: str = "ollama"
     OLLAMA_PORT: int = 11434
     OLLAMA_MODEL: str = "llama3.2:3b"
     OLLAMA_TIMEOUT: int = 120
@@ -25,12 +25,12 @@ class Settings(BaseSettings):
     STREAM: bool = True
 
     # RAG Service
-    RAG_SERVICE_URL: str = "http://localhost:8001"
+    RAG_SERVICE_URL: str = "http://rag-service:8001"
 
     # Logging
     LOG_LEVEL: str = "INFO"
 
-    model_config = ConfigDict(env_file=".env", case_sensitive=True)
+    model_config = ConfigDict(env_file=".env.docker", case_sensitive=True)
 
 
 @lru_cache()

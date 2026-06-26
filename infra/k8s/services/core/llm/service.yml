@@ -1,0 +1,19 @@
+# Service for LLM Service (HTTP & gRPC)
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-service-svc
+  namespace: agentica-app
+spec:
+  selector:
+    app: llm-service
+  ports:
+    - name: http-api
+      protocol: TCP
+      port: 8002 # Internal service port for HTTP
+      targetPort: 8002 # Container's HTTP port
+    # - name: grpc-api
+    #   protocol: TCP
+    #   port: 50052
+    #   targetPort: 50052
+  type: ClusterIP

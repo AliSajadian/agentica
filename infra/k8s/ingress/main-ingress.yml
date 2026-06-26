@@ -1,0 +1,77 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agentica-api-ingress
+  namespace: agentica-app
+  annotations:
+    # traefik.ingress.kubernetes.io/rewrite-target: /$2
+    traefik.ingress.kubernetes.io/router.middlewares: agentica-app-all-strip-prefixes@kubernetescrd
+    traefik.ingress.kubernetes.io/router.entrypoints: web # Add this line for HTTP (port 80)
+    # If you want HTTPS (port 443) as well, add:
+    # traefik.ingress.kubernetes.io/router.entrypoints: web,websecure
+    # If you only want HTTPS:
+    # traefik.ingress.kubernetes.io/router.entrypoints: websecure
+spec:
+  ingressClassName: traefik # Specify the Ingress class if needed
+  rules: # - host: 172.28.71.143
+    - host: agentica-api.localhost
+      http: # <--- This is part of the SAME rule as the 'host'
+        paths:
+          - path: /rag # <--- Simple prefix path
+            pathType: Prefix # ImplementationSpecific 
+            backend:
+              service:
+                name: rag-service-svc
+                port:
+                  number: 8001 # http-api # Route to the named HTTP port
+
+          - path: /llm 
+          # - path: /books/(.*) #/health(/|$)(.*)
+            pathType: Prefix # ImplementationSpecific #Prefix
+            backend:
+              service:
+                name: llm-service-svc
+                port:
+                  number: 8002 # http-api
+
+          # Route /memories/* -> /* (strip /memories prefix)
+          - path: /memory
+          # - path: /memories/(.*) #/health(/|$)(.*)
+            pathType: Prefix # ImplementationSpecific #Prefix
+            backend:
+              service:
+                name: memory-service-svc
+                port:
+                  number: 8003 #http-api
+
+          - path: /agent # <--- Simple prefix path
+            pathType: Prefix # ImplementationSpecific 
+            backend:
+              service:
+                name: agent-service-svc
+                port:
+                  number: 8004 # http-api # Route to the named HTTP port
+
+          - path: /gateway # <--- Simple prefix path
+            pathType: Prefix # ImplementationSpecific 
+            backend:
+              service:
+                name: gateway-service-svc
+                port:
+                  number: 8000 # http-api # Route to the named HTTP port
+
+          - path: /weather # <--- Simple prefix path
+            pathType: Prefix # ImplementationSpecific 
+            backend:
+              service:
+                name: weather-service-svc
+                port:
+                  number: 8011 # http-api # Route to the named HTTP port
+
+          - path: /search # <--- Simple prefix path
+            pathType: Prefix # ImplementationSpecific 
+            backend:
+              service:
+                name: search-service-svc
+                port:
+                  number: 8012 # http-api # Route to the named HTTP port

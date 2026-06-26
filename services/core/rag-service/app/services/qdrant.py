@@ -19,19 +19,23 @@ logger = get_logger(__name__)
 class QdrantService:
     '''Qdrant Service'''
     def __init__(self):
+        self.client = None
+        self.collection = settings.QDRANT_COLLECTION
+
+    def _get_client(self):
         self.client = AsyncQdrantClient(
             host=settings.QDRANT_HOST,
             port=settings.QDRANT_PORT,
         )
-        self.collection = settings.QDRANT_COLLECTION
+        return self.client
 
     async def init_collection(self, vector_size: int = 384):
         """Create collection if it doesn't exist."""
-        existing = await self.client.get_collections()
+        existing = await self._get_client().get_collections()
         names = [c.name for c in existing.collections]
 
         if self.collection not in names:
-            await self.client.create_collection(
+            await self._get_client().create_collection(
                 collection_name=self.collection,
                 vectors_config=VectorParams(
                     size=vector_size,
@@ -56,7 +60,7 @@ class QdrantService:
             for chunk, embedding in zip(chunks, embeddings)
         ]
 
-        await self.client.upsert(
+        await self._get_client().upsert(
             collection_name=self.collection,
             points=points
         )
@@ -83,7 +87,7 @@ class QdrantService:
                 ]
             )
 
-        results = await self.client.query_points( # search
+        results = await self._get_client().query_points( # search
             collection_name=self.collection,
             query=vector,
             limit=top_k,
@@ -104,7 +108,7 @@ class QdrantService:
 
     async def delete_by_source(self, source: str):
         """Delete all chunks from a specific source."""
-        await self.client.delete(
+        await self._get_client().delete(
             collection_name=self.collection,
             points_selector=Filter(
                 must=[

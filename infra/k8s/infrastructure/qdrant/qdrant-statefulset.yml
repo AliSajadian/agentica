@@ -1,0 +1,48 @@
+# Qdrant StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: qdrant-ss
+  namespace: agentica-app
+spec:
+  serviceName: "qdrant-svc"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: qdrant
+  template:
+    metadata:
+      labels:
+        app: qdrant
+    spec:
+      containers:
+        - name: qdrant
+          image: qdrant/qdrant:latest
+          env:
+            # - name: QDRANT__SERVICE__GRPC_PORT
+            #   value: "6334"
+            - name: QDRANT__SERVICE__HTTP_PORT
+              value: "6333"
+          ports:
+            - containerPort: 6333
+              name: http
+            # - containerPort: 6334
+            #   name: grpc
+          volumeMounts:
+            - name: qdrant-data
+              mountPath: /qdrant/storage
+          resources:
+            requests:
+              memory: "100Mi"
+              cpu: "100m"
+            limits:
+              memory: "200Mi"
+              cpu: "200m"
+  volumeClaimTemplates:
+    - metadata:
+        name: qdrant-data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        resources:
+          requests:
+            storage: 500Mi

@@ -13,14 +13,22 @@ class RateLimiter:
 
     def __init__(self):
         """Initialize Redis connection for rate limiting."""
-        self.client = aioredis.Redis(
-            host=settings.REDIS_HOST,
-            port=settings.REDIS_PORT,
-            db=settings.REDIS_DB,
-            decode_responses=True
-        )
-        self.max_requests = settings.RATE_LIMIT_REQUESTS
-        self.window = settings.RATE_LIMIT_WINDOW_SECONDS
+        self.client = None
+        self.max_requests = None
+        self.window = None
+
+    def _get_client(self):
+        if self.client is None:
+            self.client = aioredis.Redis(
+                host=settings.REDIS_HOST,
+                port=settings.REDIS_PORT,
+                db=settings.REDIS_DB,
+                password=settings.REDIS_PASSWORD or None,
+                decode_responses=True
+            )
+            self.max_requests = settings.RATE_LIMIT_REQUESTS
+            self.window = settings.RATE_LIMIT_WINDOW_SECONDS
+        return self.client
 
     async def check(self, user_id: str, endpoint: str) -> bool:
         """
@@ -30,9 +38,9 @@ class RateLimiter:
         """
         key = f"ratelimit:{user_id}:{endpoint}"
         try:
-            current = await self.client.incr(key)
+            current = await self._get_client().incr(key)
             if current == 1:
-                await self.client.expire(key, self.window)
+                await self._get_client().expire(key, self.window)
 
             if current > self.max_requests:
                 logger.warning(
@@ -61,7 +69,7 @@ class RateLimiter:
         """Return remaining requests allowed for a user on an endpoint."""
         key = f"ratelimit:{user_id}:{endpoint}"
         try:
-            current = await self.client.get(key)
+            current = await self._get_client().get(key)
             used = int(current) if current else 0
             return max(0, self.max_requests - used)
         except Exception as e:
@@ -71,7 +79,7 @@ class RateLimiter:
     async def health(self) -> bool:
         """Check Redis connection health."""
         try:
-            await self.client.ping()
+            await self._get_client().ping()
             return True
         except Exception:
             return False

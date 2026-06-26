@@ -14,14 +14,18 @@ class EmbeddingService:
     Embed service
     '''
     def __init__(self):
+        self.model = None
+
+    def _get_model(self):
         self.model = TextEmbedding(
             model_name=settings.EMBEDDING_MODEL
         )
         logger.info("embedding_model_loaded", model=settings.EMBEDDING_MODEL, device="cpu")
+        return self.model
 
     def embed(self, texts: list[str]) -> list[list[float]]:
         '''Embed'''
-        embeddings = list(self.model.embed(texts))
+        embeddings = list(self._get_model().embed(texts))
         return [e.tolist() for e in embeddings]
 
     def embed_single(self, text: str) -> list[float]:

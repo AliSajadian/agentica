@@ -4,9 +4,9 @@ services:
 
   # ── Infrastructure ───────────────────────────────────────────────────────────
 
-  postgres:
+  postgres-memory:
     image: postgres:16-alpine
-    container_name: agentica-postgres
+    container_name: agentica-memory-postgres
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
@@ -14,11 +14,31 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_memory_data:/var/lib/postgresql/data
     networks:
-      - agentica-network
+      - agentica_agentica-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d agentica_memory"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+
+  postgres-gateway:
+    image: postgres:16-alpine
+    container_name: agentica-gateway-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: agentica_gateway
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_gateway_data:/var/lib/postgresql/data
+    networks:
+      - agentica_agentica-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d agentica_gateway"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -34,7 +54,7 @@ services:
     volumes:
       - qdrant_data:/qdrant/storage
     networks:
-      - agentica-network
+      - agentica_agentica-network
     healthcheck:
       test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/6333'"]
       interval: 30s
@@ -42,15 +62,63 @@ services:
       retries: 5
       start_period: 20s
 
-  redis:
+  redis-memory:
     image: redis:7-alpine
-    container_name: agentica-redis
+    container_name: agentica-memory-redis
     ports:
       - "6379:6379"
     volumes:
-      - redis_data:/data
+      - redis_memory_data:/data
     networks:
-      - agentica-network
+      - agentica_agentica-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  redis-gateway:
+    image: redis:7-alpine
+    container_name: agentica-gateway-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - redis_gateway_data:/data
+    networks:
+      - agentica_agentica-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  redis-weather:
+    image: redis:7-alpine
+    container_name: agentica-weather-redis
+    ports:
+      - "6381:6379"
+    volumes:
+      - redis_weather_data:/data
+    networks:
+      - agentica_agentica-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  redis-search:
+    image: redis:7-alpine
+    container_name: agentica-search-redis
+    ports:
+      - "6382:6379"
+    volumes:
+      - redis_search_data:/data
+    networks:
+      - agentica_agentica-network
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 30s
@@ -70,7 +138,7 @@ services:
   #   volumes:
   #     - rabbitmq_data:/var/lib/rabbitmq
   #   networks:
-  #     - agentica-network
+  #     - agentica_agentica-network
   #   healthcheck:
   #     test: ["CMD", "rabbitmq-diagnostics", "ping"]
   #     interval: 30s
@@ -85,7 +153,7 @@ services:
     volumes:
       - ollama_data:/root/.ollama
     networks:
-      - agentica-network
+      - agentica_agentica-network
     # CPU only — no GPU section needed for Intel UHD 620
     # ── GPU alternative (nvidia) ───────────────────────────────────────────
     # deploy:
@@ -110,7 +178,7 @@ services:
       - "--storage.tsdb.path=/prometheus"
       - "--web.enable-lifecycle"
     networks:
-      - agentica-network
+      - agentica_agentica-network
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost:9090/-/healthy || exit 1"]
       interval: 30s
@@ -133,7 +201,7 @@ services:
     depends_on:
       - prometheus
     networks:
-      - agentica-network
+      - agentica_agentica-network
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost:3000/api/health || exit 1"]
       interval: 30s
@@ -141,6 +209,19 @@ services:
       retries: 3
     restart: unless-stopped
     
+  
+  # In docker-compose.yml
+  blackbox-exporter:
+    image: prom/blackbox-exporter:latest
+    container_name: agentica-blackbox-exporter
+    ports:
+      - "9115:9115"
+    volumes:
+      - ./infra/blackbox.yml:/etc/blackbox_exporter/config.yml:ro
+    networks:
+      - agentica_agentica-network
+    restart: unless-stopped
+
   # ── Services ─────────────────────────────────────────────────────────────────
 
   rag-service:
@@ -156,11 +237,12 @@ services:
       QDRANT_HOST: qdrant
       QDRANT_PORT: 6333
       QDRANT_COLLECTION: agentica
+      QDRANT__TELEMETRY_DISABLED: true
       EMBEDDING_MODEL: BAAI/bge-small-en-v1.5
       EMBEDDING_DEVICE: cpu
       CHUNK_SIZE: 512
       CHUNK_OVERLAP: 50
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
+      # RABBITMQ_URL: amqp://guest:guest@rabbitmq:5672/
       LLM_SERVICE_URL: http://llm-service:8002
       LOG_LEVEL: INFO
     depends_on:
@@ -168,7 +250,7 @@ services:
       # rabbitmq:
       #   condition: service_healthy
     networks:
-      - agentica-network
+      - agentica_agentica-network
     volumes:
       - ./services/core/rag-service:/app
     healthcheck:
@@ -191,7 +273,14 @@ services:
       APP_PORT: 8002
       OLLAMA_HOST: ollama
       OLLAMA_PORT: 11434
-      OLLAMA_MODEL: llama3.2:3b
+      OLLAMA_MODEL: llama3.2:3b  # POSTGRES_HOST: postgres-memory-svc
+  # POSTGRES_PORT: "5432"
+  # POSTGRES_USER: "postgres"
+  # POSTGRES_DB_MEMORY: "agentica_memory"
+  # POSTGRES_DB_GATEWAY: "agentica_gateway"
+  # DATABASE_URL_MEMORY: "postgresql+asyncpg://postgres:admin@postgres-memory-svc:5432/agentica_memory"
+  # DATABASE_URL_GATEWAY: "postgresql+asyncpg://postgres:admin@postgres-memory-svc:5432/agentica_gateway"
+
       OLLAMA_TIMEOUT: 120
       MAX_TOKENS: 1024
       TEMPERATURE: 0.7
@@ -202,7 +291,7 @@ services:
     depends_on:
       - ollama
     networks:
-      - agentica-network
+      - agentica_agentica-network
     volumes:
       - ./services/core/llm-service:/app
     healthcheck:
@@ -223,16 +312,16 @@ services:
     environment:
       APP_ENV: development
       APP_PORT: 8003
-      DATABASE_URL: postgresql+asyncpg://postgres:admin@postgres:5432/agentica_memory
-      REDIS_URL: redis://redis:6379/0      
+      DATABASE_URL: postgresql+asyncpg://postgres:admin@postgres-memory:5432/agentica_memory
+      REDIS_URL: redis://redis-memory:6379/0      
       LOG_LEVEL: INFO
     depends_on:
-      postgres:
+      postgres-memory:
         condition: service_healthy
-      redis:
+      redis-memory:
         condition: service_healthy
     networks:
-      - agentica-network
+      - agentica_agentica-network
     volumes:
       - ./services/core/memory-service:/app
     healthcheck:
@@ -264,7 +353,7 @@ services:
       - llm-service
       - memory-service
     networks:
-      - agentica-network
+      - agentica_agentica-network
     volumes:
       - ./services/core/agent-service:/app
     healthcheck:
@@ -285,13 +374,13 @@ services:
     environment:
       APP_ENV: development
       APP_PORT: 8000
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: postgres-gateway
       POSTGRES_PORT: 5432
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin
       POSTGRES_DB: agentica_gateway
-      DATABASE_URL: postgresql+asyncpg://postgres:admin@postgres:5432/agentica_gateway
-      REDIS_HOST: redis
+      DATABASE_URL: postgresql+asyncpg://postgres:admin@postgres-gateway:5432/agentica_gateway
+      REDIS_HOST: redis-gateway
       REDIS_PORT: 6379
       REDIS_DB: 1
       JWT_SECRET_KEY: your-super-secret-key-change-in-production
@@ -301,13 +390,13 @@ services:
       AGENT_SERVICE_URL: http://agent-service:8004
       LOG_LEVEL: INFO
     depends_on:
-      - postgres
-      - redis
+      - postgres-gateway
+      - redis-gateway
       - rag-service
       - llm-service
       - memory-service
     networks:
-      - agentica-network
+      - agentica_agentica-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
       interval: 30s
@@ -329,14 +418,14 @@ services:
       APP_ENV: development
       APP_PORT: 8011
       OPENWEATHER_API_KEY: abcd
-      REDIS_HOST: redis
+      REDIS_HOST: redis-weather
       REDIS_PORT: 6379
       REDIS_DB: 2
       LOG_LEVEL: INFO
     depends_on:
-      - redis
+      - redis-weather
     networks:
-      - agentica-network
+      - agentica_agentica-network
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:8011/health || exit 1"]
       interval: 30s
@@ -355,14 +444,14 @@ services:
     environment:
       APP_ENV: development
       APP_PORT: 8012
-      REDIS_HOST: redis
+      REDIS_HOST: redis-search
       REDIS_PORT: 6379
       REDIS_DB: 3
       LOG_LEVEL: INFO
     depends_on:
-      - redis
+      - redis-search
     networks:
-      - agentica-network
+      - agentica_agentica-network
     volumes:
     - ./services/agents/search-agent/secrets:/home/ali/projects/AI/agentica/services/agents/search-agent/secrets
     healthcheck:
@@ -377,9 +466,13 @@ services:
 # ── Volumes ───────────────────────────────────────────────────────────────────
 
 volumes:
-  postgres_data:
+  postgres_memory_data:
+  postgres_gateway_data:
   qdrant_data:
-  redis_data:
+  redis_memory_data:
+  redis_gateway_data:
+  redis_weather_data:
+  redis_search_data:
   # rabbitmq_data:
   ollama_data:
   prometheus_data:
@@ -388,5 +481,5 @@ volumes:
 # ── Networks ──────────────────────────────────────────────────────────────────
 
 networks:
-  agentica-network:
-    driver: bridge
+  agentica_agentica-network:
+    external: true

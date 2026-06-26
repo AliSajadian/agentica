@@ -6,7 +6,7 @@ from pydantic import ConfigDict
 class Settings(BaseSettings):
     """Application configuration loaded from environment variables."""
 
-    model_config = ConfigDict(env_file=".env", extra="ignore")
+    model_config = ConfigDict(env_file=".env.docker", extra="ignore")
 
     APP_ENV: str = "development"
     APP_PORT: int = 8004

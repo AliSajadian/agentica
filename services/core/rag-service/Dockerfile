@@ -2,7 +2,7 @@ FROM python:3.11-slim-bullseye
 
 WORKDIR /app
 
-# install only ca-certificates for HTTPS requests
+# install only ca-certificates for HTTPS requests, wget, and curl
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     wget \
@@ -13,6 +13,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 COPY requirements.txt .
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
+
+# Pre-download embedding model during build
+RUN python3 -c "from fastembed import TextEmbedding; TextEmbedding(model_name='BAAI/bge-small-en-v1.5')"
 
 # copy app code last (most frequently changing layer)
 COPY . .
