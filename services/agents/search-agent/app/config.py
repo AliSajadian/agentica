@@ -32,9 +32,10 @@ class Settings(BaseSettings):
     DUCKDUCKGO_BASE_URL: str = "https://api.duckduckgo.com"
 
     # Redis Cache
-    REDIS_HOST: str = "redis-search"
+    REDIS_HOST: str = "redis-search-svc.agentica-app.svc.cluster.local"
     REDIS_PORT: int = 6379
     REDIS_DB: int = 3
+    REDIS_PASSWORD: str = ""
     SEARCH_CACHE_TTL: int = 300
 
     # Logging

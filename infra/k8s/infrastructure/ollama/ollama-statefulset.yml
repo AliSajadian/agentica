@@ -22,8 +22,25 @@ spec:
             - /bin/sh
             - -c
             - |
-              ollama pull llama3.2:3b
-              ollama pull nomic-embed-text  # Optional: add other models
+              set -e
+
+              ollama serve &
+
+              # Wait until the Ollama server is ready
+              until ollama list >/dev/null 2>&1; do
+                sleep 2
+              done
+
+              # Pull required models with retries
+              until ollama pull llama3.2:3b; do
+                echo "Failed to pull llama3.2:3b, retrying in 10s..."
+                sleep 10
+              done
+
+              until ollama pull nomic-embed-text; do
+                echo "Failed to pull nomic-embed-text, retrying in 10s..."
+                sleep 10
+              done
           volumeMounts:
             - name: ollama-data
               mountPath: /root/.ollama
@@ -56,4 +73,4 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: 2Gi  # Adjust for your expected model sizes (e.g., llama3.1:8b is ~4.7GB) [citation:1]
+            storage: 10Gi  # Adjust for your expected model sizes (e.g., llama3.1:8b is ~4.7GB) [citation:1]

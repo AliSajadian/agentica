@@ -51,10 +51,10 @@ spec:
                 name: app-secrets
           resources:
             requests:
-              memory: "128Mi"
+              memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "256Mi"
+              memory: "512Mi"
               cpu: "200m"
           livenessProbe:
             httpGet:
@@ -68,7 +68,7 @@ spec:
             httpGet:
               path: /ready
               port: http-api
-            initialDelaySeconds: 20
+            initialDelaySeconds: 45
             periodSeconds: 10
-            failureThreshold: 3
-            timeoutSeconds: 5
+            failureThreshold: 5
+            timeoutSeconds: 10

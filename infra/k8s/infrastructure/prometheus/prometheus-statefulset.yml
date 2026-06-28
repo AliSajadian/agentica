@@ -27,15 +27,16 @@ spec:
             - containerPort: 9090
           volumeMounts:
             - name: prometheus-config
-              mountPath: /etc/prometheus
+              mountPath: /etc/prometheus/config.yml
+              subPath: prometheus.yml
             - name: prometheus-data
               mountPath: /prometheus
           resources:
             requests:
-              memory: "50Mi"
+              memory: "256Mi"
               cpu: "100m"
             limits:
-              memory: "100Mi"
+              memory: "512Mi"
               cpu: "200m"
       volumes:
         - name: prometheus-config

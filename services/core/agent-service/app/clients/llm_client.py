@@ -13,7 +13,7 @@ class LlmClient:
     def __init__(self):
         """Initialise httpx async client."""
         self._client = httpx.AsyncClient(
-            base_url=settings.LLM_SERVER_URL,
+            base_url=settings.LLM_SERVICE_URL,
             timeout=settings.HTTP_TIMEOUT,
         )
 

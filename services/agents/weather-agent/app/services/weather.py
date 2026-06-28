@@ -21,13 +21,19 @@ class WeatherService:
 
     def __init__(self):
         """Initialize Redis cache client."""
+        self.cache = None
+        self.ttl = settings.WEATHER_CACHE_TTL
+
+    def _get_client(self):
+        """Initialize Redis cache client."""
         self.cache = aioredis.Redis(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
             db=settings.REDIS_DB,
+            password=settings.REDIS_PASSWORD or None,
             decode_responses=True
         )
-        self.ttl = settings.WEATHER_CACHE_TTL
+        return self.cache
 
     async def get_current(self, request: WeatherRequest) -> WeatherResponse:
         """
@@ -174,7 +180,7 @@ class WeatherService:
     async def _get_cache(self, key: str) -> dict | None:
         """Retrieve cached weather data from Redis."""
         try:
-            value = await self.cache.get(key)
+            value = await self._get_client().get(key)
             if value:
                 logger.info("weather_cache_hit", key=key)
                 return json.loads(value)
@@ -186,7 +192,7 @@ class WeatherService:
     async def _set_cache(self, key: str, value: dict):
         """Store weather data in Redis with TTL."""
         try:
-            await self.cache.setex(key, self.ttl, json.dumps(value))
+            await self._get_client().setex(key, self.ttl, json.dumps(value))
         except Exception as e:
             logger.error("weather_cache_set_failed", error=str(e))
 

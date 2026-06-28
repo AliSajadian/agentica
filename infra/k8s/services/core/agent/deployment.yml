@@ -28,11 +28,11 @@ spec:
             - name: APP_PORT
               value: "8004"
             - name: RAG_SERVICE_URL
-              value: http://rag-service:8001
+              value: http://rag-service-svc:8001
             - name: LLM_SERVICE_URL
-              value: http://llm-service:8002
+              value: http://llm-service-svc:8002
             - name: MEMORY_SERVICE_URL 
-              value: http://memory-service:8003
+              value: http://memory-service-svc:8003
             - name: HTTP_TIMEOUT 
               value: "30"
             - name: HTTP_MAX_RETRIES
@@ -53,11 +53,15 @@ spec:
             httpGet:
               path: /health
               port: http-api
-            initialDelaySeconds: 10
-            periodSeconds: 5
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /ready
               port: http-api
-            initialDelaySeconds: 15
-            periodSeconds: 5
+            initialDelaySeconds: 45
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 10

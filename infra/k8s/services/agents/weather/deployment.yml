@@ -25,10 +25,18 @@ spec:
             # - name: grpc-api
             #   containerPort: 50052 # Your gRPC port
           env:
+            - name: OPENWEATHER_API_KEY
+              value: "bc3fd8b7cbc771df346c6a812905fb7d"
+            - name: OPENWEATHER_BASE_URL
+              value: "https://api.openweathermap.org/data/2.5"
+            - name: OPENWEATHER_UNITS
+              value: "metric"
+            - name: OPENWEATHER_LANG
+              value: "en"
             - name: APP_PORT
               value: "8011"
             - name: REDIS_HOST
-              value: "redis-memory-svc"
+              value: "redis-memory-svc.agentica-app.svc.cluster.local"
             - name: REDIS_PORT
               value: "6379"
             - name: REDIS_DB
@@ -40,20 +48,24 @@ spec:
                 name: app-secrets
           resources:
             requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
               memory: "128Mi"
               cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
           livenessProbe:
             httpGet:
               path: /health
               port: http-api
             initialDelaySeconds: 10
-            periodSeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /ready
               port: http-api
-            initialDelaySeconds: 15
-            periodSeconds: 5
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5

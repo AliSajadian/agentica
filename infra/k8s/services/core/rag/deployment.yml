@@ -43,7 +43,7 @@ spec:
           resources:
             requests:
               memory: "512Mi"
-              cpu: "100m"
+              cpu: "200m"
             limits:
               memory: "1Gi"
               cpu: "500m"
@@ -51,11 +51,15 @@ spec:
             httpGet:
               path: /health
               port: http-api
-            initialDelaySeconds: 10
-            periodSeconds: 5
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /ready
               port: http-api
-            initialDelaySeconds: 15
-            periodSeconds: 5
+            initialDelaySeconds: 90
+            periodSeconds: 10
+            failureThreshold: 6
+            timeoutSeconds: 10

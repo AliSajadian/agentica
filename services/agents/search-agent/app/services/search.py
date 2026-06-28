@@ -20,13 +20,19 @@ class SearchService:
 
     def __init__(self):
         """Initialize Redis cache client."""
+        self.cache = None
+        self.ttl = settings.SEARCH_CACHE_TTL
+
+    def _get_client(self):
+        """Initialize Redis cache client."""
         self.cache = aioredis.Redis(
             host=settings.REDIS_HOST,
             port=settings.REDIS_PORT,
             db=settings.REDIS_DB,
+            password=settings.REDIS_PASSWORD,
             decode_responses=True
         )
-        self.ttl = settings.SEARCH_CACHE_TTL
+        return self.cache
 
     async def search1(self, request: SearchRequest) -> SearchResponse:
         """
@@ -241,7 +247,7 @@ class SearchService:
     async def _get_cache(self, key: str) -> dict | None:
         """Retrieve cached search results from Redis."""
         try:
-            value = await self.cache.get(key)
+            value = await self._get_client().get(key)
             if value:
                 logger.info("search_cache_hit", key=key)
                 return json.loads(value)
@@ -253,7 +259,7 @@ class SearchService:
     async def _set_cache(self, key: str, value: dict):
         """Store search results in Redis with TTL."""
         try:
-            await self.cache.setex(key, self.ttl, json.dumps(value))
+            await self._get_client().setex(key, self.ttl, json.dumps(value))
         except Exception as e:
             logger.error("search_cache_set_failed", error=str(e))
 

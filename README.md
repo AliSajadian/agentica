@@ -268,6 +268,33 @@ pytest tests/ -v
 
 ---
 
+## Kubernetes Deployment Status
+
+The following services are currently deployed and running on a local **k3s** cluster.
+
+| Component | Type | Status | Replicas |
+|-----------|------|--------|----------|
+| gateway-service | Deployment | ✅ Running | 1/1 |
+| agent-service | Deployment | ✅ Running | 1/1 |
+| rag-service | Deployment | ✅ Running | 1/1 |
+| llm-service | Deployment | ✅ Running | 1/1 |
+| memory-service | Deployment | ✅ Running | 1/1 |
+| search-service | Deployment | ✅ Running | 1/1 |
+| weather-service | Deployment | ✅ Running | 1/1 |
+| ollama | StatefulSet | ✅ Running | 1/1 |
+| qdrant | StatefulSet | ✅ Running | 1/1 |
+| postgres-gateway | StatefulSet | ✅ Running | 1/1 |
+| postgres-memory | StatefulSet | ✅ Running | 1/1 |
+| redis-gateway | StatefulSet | ✅ Running | 1/1 |
+| redis-memory | StatefulSet | ✅ Running | 1/1 |
+| redis-search | StatefulSet | ✅ Running | 1/1 |
+| redis-weather | StatefulSet | ✅ Running | 1/1 |
+| prometheus | StatefulSet | ✅ Running | 1/1 |
+| grafana | Deployment | ✅ Running | 1/1 |
+| blackbox-exporter | Deployment | ✅ Running | 1/1 |
+
+> **Current cluster status:** 18/18 workloads are healthy and running on Kubernetes (k3s).
+
 ## Roadmap
 
 ### Phase 1 — Core Platform

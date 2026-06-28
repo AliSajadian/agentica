@@ -2,6 +2,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
 from app.config import settings
@@ -62,11 +64,56 @@ app.include_router(complete.router, prefix="/api/v1", tags=["complete"])
 @app.get("/health", tags=["health"])
 async def health():
     '''Health'''
-    ollama_ok = await ollama_client.health()
     return {
         "status": "ok",
         "service": settings.APP_NAME,
         "env": settings.APP_ENV,
-        "ollama": "connected" if ollama_ok else "unreachable",
-        "model": settings.OLLAMA_MODEL,
     }
+
+
+@app.get("/ready")
+async def ready():
+    """Readiness check - verify Ollama connectivity and model availability."""
+    try:
+        # Check if Ollama is reachable
+        if not await ollama_client.health():
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "status": "unhealthy",
+                    "service": settings.APP_NAME,
+                    "error": "ollama_unreachable"
+                }
+            )
+        
+        # Check if the required model is available
+        models = await ollama_client.list_models()
+        if settings.OLLAMA_MODEL not in models:
+            return JSONResponse(
+                status_code=503,
+                content={
+                    "status": "unhealthy",
+                    "service": settings.APP_NAME,
+                    "error": f"model_not_found: {settings.OLLAMA_MODEL}",
+                    "available_models": models
+                }
+            )
+        
+        return {
+            "status": "ok",
+            "service": settings.APP_NAME,
+            "env": settings.APP_ENV,
+            "ollama": "connected",
+            "model": settings.OLLAMA_MODEL
+        }
+        
+    except Exception as e:
+        logger.error("readiness_check_failed", error=str(e))
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "unhealthy",
+                "service": settings.APP_NAME,
+                "error": str(e)
+            }
+        )

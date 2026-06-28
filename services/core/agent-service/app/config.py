@@ -12,9 +12,9 @@ class Settings(BaseSettings):
     APP_PORT: int = 8004
     LOG_LEVEL: str = "INFO"
 
-    RAG_SERVER_URL: str = "http://rag-service:8001"
-    LLM_SERVER_URL: str = "http://llm-service:8002"
-    MEMORY_SERVER_URL: str = "http://memory-service:8003"
+    RAG_SERVICE_URL: str = "http://rag-service-svc:8001"
+    LLM_SERVICE_URL: str = "http://llm-service-svc:8002"
+    MEMORY_SERVICE_URL: str = "http://memory-service-svc:8003"
 
     HTTP_TIMEOUT: int = 30
     HTTP_MAX_RETRIES: int = 3

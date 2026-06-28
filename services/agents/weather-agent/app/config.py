@@ -13,15 +13,16 @@ class Settings(BaseSettings):
     DEBUG: bool = True
 
     # OpenWeatherMap
-    OPENWEATHER_API_KEY: str = "abcd"
+    OPENWEATHER_API_KEY: str = "bc3fd8b7cbc771df346c6a812905fb7d"
     OPENWEATHER_BASE_URL: str = "https://api.openweathermap.org/data/2.5"
     OPENWEATHER_UNITS: str = "metric"
     OPENWEATHER_LANG: str = "en"
 
     # Redis Cache
-    REDIS_HOST: str = "redis-weather"
+    REDIS_HOST: str = "redis-weather-svc.agentica-app.svc.cluster.local"
     REDIS_PORT: int = 6379
-    REDIS_DB: int = 2
+    REDIS_DB: int = 0
+    REDIS_PASSWORD: str = ""
     WEATHER_CACHE_TTL: int = 1800
 
     # Logging

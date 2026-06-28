@@ -13,7 +13,7 @@ class MemoryClient:
     def __init__(self):
         """Initialise httpx async client."""
         self._client = httpx.AsyncClient(
-            base_url=settings.MEMORY_SERVER_URL,
+            base_url=settings.MEMORY_SERVICE_URL,
             timeout=settings.HTTP_TIMEOUT,
         )
 

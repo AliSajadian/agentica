@@ -1,13 +1,15 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
-from app.core.tavily import search_client
+
+from app.core.duckduckgo import search_client
 
 from app.config import settings
 from app.utils.logger import setup_logging, get_logger
 from app.api.v1 import search
-
+from app.services.search import search_service
 logger = get_logger(__name__)
 
 
@@ -54,11 +56,47 @@ app.include_router(search.router, prefix="/api/v1/search", tags=["search"])
 @app.get("/health", tags=["health"])
 async def health():
     """Health check including search API status."""
-    api_ok = await search_client.health()
+    # api_ok = await search_client.health()
     return {
         "status": "ok",
         "service": settings.APP_NAME,
         "env": settings.APP_ENV,
-        "search_api": "connected" if api_ok else "unreachable",
+        # "search_api": "connected" if api_ok else "unreachable",
         "provider": settings.SEARCH_PROVIDER
     }
+
+
+@app.get("/ready")
+async def ready():
+    """Check if Redis is reachable."""
+    try:
+        # Check OpenWeather connectivity
+        api_ok = await search_client.health()
+
+        # Check Redis connectivity
+        redis_ok = await search_service._get_client().ping()
+
+        # Check if all critical services are ready
+        all_ready = api_ok and redis_ok
+        
+        status_code = 200 if all_ready else 503
+        return JSONResponse(
+            status_code=status_code,
+            content={
+                "status": "ready" if all_ready else "not_ready",
+                "service": settings.APP_NAME,
+                "env": settings.APP_ENV,
+                "duckduckgo": "connected" if api_ok else "unreachable",
+                "redis": "connected" if redis_ok else "unreachable"
+            }
+        )
+    except Exception as e:
+        logger.error("readiness_check_failed", error=str(e))
+        return JSONResponse(
+            status_code=503,
+            content={
+                "status": "unhealthy",
+                "service": settings.APP_NAME,
+                "error": str(e)
+            }
+        )

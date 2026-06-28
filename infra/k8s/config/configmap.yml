@@ -43,13 +43,14 @@ data:
   # USER_EVENTS_EXCHANGE_NAME: "user.events"
 
   # ── Services URLs ──────────────────────────────────────────────────────────
-  RAG_SERVICE_URL: "http://rag-svc:8001"
-  LLM_SERVICE_URL: "http://llm-svc:8002"
-  MEMORY_SERVICE_URL: "http://memory-svc:8003"
-  AGENT_SERVICE_URL: "http://agent-svc:8004"
-  GATEWAY_SERVICE_URL: "http://gateway-svc:8000"
+  RAG_SERVICE_URL: "http://rag-service-svc:8001"
+  LLM_SERVICE_URL: "http://llm-service-svc:8002"
+  MEMORY_SERVICE_URL: "http://memory-service-svc:8003"
+  AGENT_SERVICE_URL: "http://agent-service-svc:8004"
+  GATEWAY_SERVICE_URL: "http://gateway-service-svc:8000"
 
   # ── Service Ports ──────────────────────────────────────────────────────────
+  RAG_PORT: "8001"
   LLM_PORT: "8002"
   MEMORY_PORT: "8003"
   AGENT_PORT: "8004"
@@ -71,3 +72,47 @@ data:
   ALGORITHM: "HS256"
   ACCESS_TOKEN_EXPIRE_MINUTES: "30"
   REFRESH_EXPIRE_DAYS: "40"
+
+  # ── Prometheus ────────────────────────────────────────────────────────────────────
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      - job_name: 'blackbox-http'
+        metrics_path: /probe
+        params:
+          module: [http_2xx]
+        static_configs:
+          - targets:
+            - http://gateway-svc:8000/health
+            - http://rag-svc:8001/health
+            - http://llm-svc:8002/health
+        relabel_configs:
+          - source_labels: [__address__]
+            target_label: __param_target
+          - source_labels: [__param_target]
+            target_label: instance
+          - target_label: __address__
+            replacement: blackbox-svc:9115
+
+  # ── Blackbox ────────────────────────────────────────────────────────────────────
+  blackbox.yml: |
+    modules:
+      http_2xx:
+        prober: http
+        timeout: 5s
+        http:
+          valid_status_codes: []
+          method: GET
+      http_post_2xx:
+        prober: http
+        timeout: 5s
+        http:
+          valid_status_codes: []
+          method: POST

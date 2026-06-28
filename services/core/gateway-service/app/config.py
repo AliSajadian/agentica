@@ -38,10 +38,10 @@ class Settings(BaseSettings):
     RATE_LIMIT_WINDOW_SECONDS: int = 60
 
     # Upstream Services
-    RAG_SERVICE_URL: str = "http://rag-service:8001"
-    LLM_SERVICE_URL: str = "http://llm-service:8002"
-    MEMORY_SERVICE_URL: str = "http://memory-service:8003"
-    AGENT_SERVICE_URL: str = "http://agent-service:8004"
+    RAG_SERVICE_URL: str = "http://rag-service-svc:8001"
+    LLM_SERVICE_URL: str = "http://llm-service-svc:8002"
+    MEMORY_SERVICE_URL: str = "http://memory-service-svc:8003"
+    AGENT_SERVICE_URL: str = "http://agent-service-svc:8004"
 
     # Logging
     LOG_LEVEL: str = "INFO"

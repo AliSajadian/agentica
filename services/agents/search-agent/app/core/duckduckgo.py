@@ -1,4 +1,4 @@
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 from app.utils.logger import get_logger
 from fastapi import HTTPException, status
 

@@ -23,7 +23,8 @@ spec:
             - containerPort: 9115
           volumeMounts:
             - name: blackbox-config
-              mountPath: /etc/blackbox_exporter
+              mountPath: /etc/blackbox_exporter/config.yml
+              subPath: blackbox.yml  # Mount the ConfigMap key as config.yml
           resources:
             requests:
               memory: "64Mi"

@@ -15,6 +15,11 @@ spec:
       labels:
         app: search-service
     spec:
+      volumes:
+        - name: secrets
+          hostPath:
+            path: /home/ali/projects/AI/agentica/services/agents/search-agent/secrets
+            type: Directory
       containers:
         - name: search-service
           image: agentica-search-service:latest # Replace with your image
@@ -27,8 +32,10 @@ spec:
           env:
             - name: APP_PORT
               value: "8012"
+            - name: DUCKDUCKGO_BASE_URL
+              value: "https://api.duckduckgo.com"
             - name: REDIS_HOST
-              value: "redis-memory-svc"
+              value: "redis-memory-svc.agentica-app.svc.cluster.local"
             - name: REDIS_PORT
               value: "6379"
             - name: REDIS_DB
@@ -38,22 +45,29 @@ spec:
                 name: app-config
             - secretRef:
                 name: app-secrets
+          volumeMounts:
+            - name: secrets
+              mountPath: /home/ali/projects/AI/agentica/services/agents/search-agent/secrets
           resources:
             requests:
+              memory: "64Mi"
+              cpu: "50m"
+            limits:
               memory: "128Mi"
               cpu: "100m"
-            limits:
-              memory: "256Mi"
-              cpu: "200m"
           livenessProbe:
             httpGet:
               path: /health
               port: http-api
             initialDelaySeconds: 10
-            periodSeconds: 5
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5
           readinessProbe:
             httpGet:
               path: /ready
               port: http-api
-            initialDelaySeconds: 15
-            periodSeconds: 5
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 3
+            timeoutSeconds: 5

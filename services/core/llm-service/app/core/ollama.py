@@ -114,7 +114,8 @@ class OllamaClient:
             async with httpx.AsyncClient(timeout=5) as client:
                 response = await client.get(f"{self.base_url}/api/tags")
                 return response.status_code == 200
-        except Exception:
+        except Exception as e:
+            logger.exception("ollama_health_failed", error=str(e))
             return False
 
     async def list_models(self) -> list[str]:
