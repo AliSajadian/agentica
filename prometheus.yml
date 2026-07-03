@@ -32,6 +32,10 @@ scrape_configs:
     static_configs:
       - targets: ["search-agent:8012"]
 
+  - job_name: "fluent-bit"
+    static_configs:
+      - targets: ["fluent-bit:2021"]
+      
   - job_name: 'blackbox-http'
     metrics_path: /probe
     params:

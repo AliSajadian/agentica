@@ -68,7 +68,7 @@ data:
   CHUNK_SIZE: "512"
   CHUNK_OVERLAP: "50"
 
-  # ── JWT ────────────────────────────────────────────────────────────────────
+  # ── JWT ────────────────────────────────────────────────────────────────────-──────
   ALGORITHM: "HS256"
   ACCESS_TOKEN_EXPIRE_MINUTES: "30"
   REFRESH_EXPIRE_DAYS: "40"
@@ -84,15 +84,55 @@ data:
         static_configs:
           - targets: ['localhost:9090']
 
+      - job_name: "rag-service"
+        static_configs:
+          - targets: ["rag-service-svc:8001"]
+
+      - job_name: "llm-service"
+        static_configs:
+          - targets: ["llm-service-svc:8002"]
+
+      - job_name: "memory-service"
+        static_configs:
+          - targets: ["memory-service-svc:8003"]
+
+      - job_name: "agent-service"
+        static_configs:
+          - targets: ["agent-service-svc:8004"]
+
+      - job_name: "gateway-service"
+        static_configs:
+          - targets: ["gateway-service-svc:8000"]
+
+      - job_name: "weather-agent"
+        static_configs:
+          - targets: ["weather-service-svc:8011"]
+
+      - job_name: "search-agent"
+        static_configs:
+          - targets: ["search-service-svc:8012"]
+
+      - job_name: "fluent-bit"
+        scrape_interval: 60s
+        scrape_timeout: 30s
+        sample_limit: 5000
+        static_configs:
+          - targets: ["fluent-bit:2021"]
+
       - job_name: 'blackbox-http'
         metrics_path: /probe
         params:
           module: [http_2xx]
         static_configs:
           - targets:
-            - http://gateway-svc:8000/health
-            - http://rag-svc:8001/health
-            - http://llm-svc:8002/health
+            - http://gateway-service-svc:8000/health
+            - http://rag-service-svc:8001/health
+            - http://llm-service-svc:8002/health
+            - http://memory-service-svc:8003/health
+            - http://agent-service-svc:8004/health
+            - http://weather-service-svc:8011/health
+            - http://search-service-svc:8012/health
+            - https://github.com    
         relabel_configs:
           - source_labels: [__address__]
             target_label: __param_target

@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: fluent-bit
+  namespace: agentica-app
+  labels:
+    app: fluent-bit
+    component: logging
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "2020"
+    prometheus.io/path: "/api/v1/metrics/prometheus"
+spec:
+  selector:
+    app: fluent-bit
+  ports:
+    - name: http
+      port: 2020
+      targetPort: 2020
+      protocol: TCP
+  clusterIP: None

@@ -68,7 +68,7 @@ dmypy.json
 .pyre/
 
 # =================================
-# Node.js (NestJS) Specific Ignores  
+# Node.js (NestJS) Specific Ignores
 # =================================
 
 # Dependencies
