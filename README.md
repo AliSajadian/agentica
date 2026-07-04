@@ -1,4 +1,3 @@
-```
 # Agentica
 
 A production-grade agentic AI orchestration platform built with FastAPI, Ollama, and Qdrant.
@@ -14,11 +13,11 @@ search the web, and (soon) plan trips, track finances, and manage schedules thro
 
 A single user message like:
 
-```
+
 "Plan me a 3-day trip to Paris next weekend, find the cheapest flights from Tehran,
 book a hotel near the Eiffel Tower under $100/night,
 and tell me what to pack based on the weather forecast."
-```
+
 
 Gets automatically orchestrated across multiple specialized agents:
 
@@ -391,4 +390,3 @@ Pull requests are welcome. For major changes please open an issue first.
 ## License
 
 MIT
-```
