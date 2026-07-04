@@ -54,56 +54,56 @@ agentica/
 
 ## Core Platform Services
 
-| Service | Port | Responsibility |
-|---|---|---|
-| gateway-service | 8000 | Single entry point, JWT auth, rate limiting, routing |
-| rag-service | 8001 | Document ingestion, chunking, embedding, vector search |
-| llm-service | 8002 | LLM inference, RAG-powered answer generation |
-| memory-service | 8003 | Conversation history, session state, agent handoff |
-| agent-service | 8004 | Multi-agent orchestration, task decomposition, LangGraph |
+|     Service     |  Port  |                     Responsibility                       |
+|-----------------|--------|----------------------------------------------------------|
+| gateway-service |  8000  | Single entry point, JWT auth, rate limiting, routing     |
+| rag-service     |  8001  | Document ingestion, chunking, embedding, vector search   |
+| llm-service     |  8002  | LLM inference, RAG-powered answer generation             |
+| memory-service  |  8003  | Conversation history, session state, agent handoff       |
+| agent-service   |  8004  | Multi-agent orchestration, task decomposition, LangGraph |
 
 ## Domain Agent Services
 
-| Service | Port | External API | Capability |
-|---|---|---|---|
-| travel-agent | 8010 | Amadeus / Skyscanner | Flights, hotels, trains |
-| weather-agent | 8011 | OpenWeatherMap | Forecasts, alerts |
-| search-agent | 8012 | SerpAPI / Brave Search | Real-time web search |
-| finance-agent | 8013 | Alpha Vantage / CoinGecko | Stocks, currency, crypto |
-| news-agent | 8014 | NewsAPI | Latest news by topic |
-| calendar-agent | 8015 | Google Calendar | Schedules, reminders |
-| maps-agent | 8016 | Google Maps | Directions, nearby places |
-| email-agent | 8017 | Gmail API | Send, read, summarize emails |
+|    Service      |  Port  |       External API        |          Capability          |
+|-----------------|--------|---------------------------|------------------------------|
+| travel-agent    |  8010  | Amadeus / Skyscanner      | Flights, hotels, trains      |
+| weather-agent   |  8011  | OpenWeatherMap            | Forecasts, alerts            |
+| search-agent    |  8012  | SerpAPI / Brave Search    | Real-time web search         |
+| finance-agent   |  8013  | Alpha Vantage / CoinGecko | Stocks, currency, crypto     |
+| news-agent      |  8014  | NewsAPI                   | Latest news by topic         |
+| calendar-agent  |  8015  | Google Calendar           | Schedules, reminders         |
+| maps-agent      |  8016  | Google Maps               | Directions, nearby places    |
+| email-agent     |  8017  | Gmail API                 | Send, read, summarize emails |
 
 ## Infrastructure Services
 
-| Service | Port | Responsibility |
-|---|---|---|
-| qdrant | 6333 | Vector database |
-| ollama | 11434 | Local LLM runtime (llama3.2:3b) |
-| redis | 6379 | Session cache, short-term memory |
-| rabbitmq | 5672 | Async task queues between agents |
-| prometheus | 9090 | Metrics collection |
-| grafana | 3000 | Metrics visualization |
+|     Service     |  Port  |                     Responsibility                       |
+|-----------------|--------|----------------------------------------------------------|
+| qdrant          |  6333  | Vector database                                          |
+| ollama          | 11434  | Local LLM runtime (llama3.2:3b)                          |
+| redis           |  6379  | Session cache, short-term memory                         |
+| rabbitmq        |  5672  | Async task queues between agents                         |
+| prometheus      |  9090  | Metrics collection                                       |
+| grafana         |  3000  | Metrics visualization                                    |
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| API Framework | FastAPI + Uvicorn |
-| LLM Runtime | Ollama (llama3.2:3b) |
-| Agent Orchestration | LangGraph |
-| Vector Database | Qdrant |
-| Embeddings | FastEmbed (BAAI/bge-small-en-v1.5) |
-| Validation | Pydantic v2 |
-| Logging | Structlog |
-| Message Queue | RabbitMQ |
-| Cache | Redis |
-| Observability | Prometheus + Grafana |
-| Containerization | Docker + Docker Compose |
-| Orchestration | Kubernetes (k3s) |
+|           Layer          |                        Technology                        |
+|--------------------------|----------------------------------------------------------|
+| API Framework            | FastAPI + Uvicorn                                        |
+| LLM Runtime              | Ollama (llama3.2:3b)                                     |
+| Agent Orchestration      | LangGraph                                                |
+| Vector Database          | Qdrant                                                   |
+| Embeddings               | FastEmbed (BAAI/bge-small-en-v1.5)                       |
+| Validation               | Pydantic v2                                              |
+| Logging                  | Structlog                                                |
+| Message Queue            | RabbitMQ                                                 |
+| Cache                    | Redis                                                    |
+| Observability            | Prometheus + Grafana                                     |
+| Containerization         | Docker + Docker Compose                                  |
+| Orchestration            | Kubernetes (k3s)                                         |
 
 ---
 
@@ -153,40 +153,40 @@ uvicorn app.main:app --reload --port 8001
 
 ### Gateway Service (port 8000)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/auth/login` | Authenticate and get JWT token |
-| POST | `/auth/register` | Register new user |
-| POST | `/agent/chat` | Main entry point — send message to agent orchestrator |
-| GET | `/health` | Health check |
+| Method |      Endpoint     |                     Description                        |
+|--------|-------------------|--------------------------------------------------------|
+|  POST  | `/auth/login`     | Authenticate and get JWT token                         |
+|  POST  | `/auth/register`  | Register new user                                      |
+|  POST  | `/agent/chat`     | Main entry point — send message to agent orchestrator  |
+|  GET   | `/health`         | Health check                                           |
 
 ### RAG Service (port 8001)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/v1/ingest` | Ingest raw text into vector DB |
-| POST | `/api/v1/ingest/file` | Ingest .pdf or .txt file |
-| POST | `/api/v1/search` | Semantic similarity search |
-| POST | `/api/v1/query` | RAG query — retrieves context + generates answer |
-| GET | `/health` | Health check |
+| Method |       Endpoint        |                   Description                      |
+|--------|-----------------------|----------------------------------------------------|
+|  POST  | `/api/v1/ingest`      | Ingest raw text into vector DB                     |
+|  POST  | `/api/v1/ingest/file` | Ingest .pdf or .txt file                           |
+|  POST  | `/api/v1/search`      | Semantic similarity search                         |
+|  POST  | `/api/v1/query`       | RAG query — retrieves context + generates answer   |
+|  GET   | `/health`             | Health check                                       |
 
 ### LLM Service (port 8002)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/v1/complete` | Single prompt completion |
-| POST | `/api/v1/chat` | Multi-turn conversation |
-| POST | `/api/v1/chat/rag` | RAG-powered chat with context chunks |
-| GET | `/health` | Health check |
+| Method |       Endpoint      |                     Description                      |
+|--------|---------------------|------------------------------------------------------|
+|  POST  | `/api/v1/complete`  | Single prompt completion                             |
+|  POST  | `/api/v1/chat`      | Multi-turn conversation                              |
+|  POST  | `/api/v1/chat/rag`  | RAG-powered chat with context chunks                 |
+|  GET   | `/health`           | Health check                                         |
 
 ### Agent Service (port 8004)
 
-| Method | Endpoint | Description |
-|---|---|---|
-| POST | `/api/v1/agent/run` | Run a multi-step agent task |
-| POST | `/api/v1/agent/chat` | Conversational agent with tool use |
-| GET | `/api/v1/agent/tasks/{task_id}` | Get task status and result |
-| GET | `/health` | Health check |
+| Method |            Endpoint             |               Description                |
+|--------|---------------------------------|------------------------------------------|
+|  POST  | `/api/v1/agent/run`             | Run a multi-step agent task              |
+|  POST  | `/api/v1/agent/chat`            | Conversational agent with tool use       |
+|  GET   | `/api/v1/agent/tasks/{task_id}` | Get task status and result               |
+|  GET   | `/health`                       | Health check                             |
 
 ### Interactive API Docs
 
@@ -227,21 +227,22 @@ Internal services  → HTTP/REST (current) → gRPC (planned)
 External clients   → REST API via gateway-service
 Async tasks        → RabbitMQ message queues
 Session state      → Redis
-
 ---
 
 ## Running Tests
 
 ```bash
-# rag-service
-cd services/rag-service
-pip install pytest pytest-asyncio httpx
+cd services/core/rag-service
 pytest tests/ -v
 
-# llm-service
-cd services/llm-service
+cd services/core/llm-service
+pytest tests/ -v
+
+cd services/core/memory-service
 pytest tests/ -v
 ```
+
+All test suites use `pytest-asyncio`, mocked upstream clients, and `conftest.py` shared fixtures.
 
 ---
 
@@ -249,77 +250,83 @@ pytest tests/ -v
 
 ### RAG Service
 
-| Variable | Default | Description |
-|---|---|---|
-| `QDRANT_HOST` | localhost | Qdrant host |
-| `QDRANT_COLLECTION` | agentica | Collection name |
-| `EMBEDDING_MODEL` | BAAI/bge-small-en-v1.5 | Embedding model |
-| `CHUNK_SIZE` | 512 | Chunk size in tokens |
-| `LLM_SERVICE_URL` | http://localhost:8002 | LLM service URL |
+|       Variable      |           Default          |            Description            |
+|---------------------|----------------------------|-----------------------------------|
+| `QDRANT_HOST`       | localhost                  | Qdrant host                       |
+| `QDRANT_COLLECTION` | agentica                   | Collection name                   |
+| `EMBEDDING_MODEL`   | BAAI/bge-small-en-v1.5     | Embedding model                   |
+| `CHUNK_SIZE`        | 512                        | Chunk size in tokens              |
+| `LLM_SERVICE_URL`   | http://localhost:8002      | LLM service URL                   |
 
 ### LLM Service
 
-| Variable | Default | Description |
-|---|---|---|
-| `OLLAMA_HOST` | localhost | Ollama host |
-| `OLLAMA_MODEL` | llama3.2:3b | Model name |
-| `TEMPERATURE` | 0.7 | Generation temperature |
-| `MAX_TOKENS` | 1024 | Max tokens per response |
+|       Variable      |           Default          |            Description            |
+|---------------------|----------------------------|-----------------------------------|
+| `OLLAMA_HOST`       | localhost                  | Ollama host                       |
+| `OLLAMA_MODEL`      | llama3.2:3b                | Model name                        |
+| `TEMPERATURE`       | 0.7                        | Generation temperature            |
+| `MAX_TOKENS`        | 1024                       | Max tokens per response           |
 
 ---
 
 ## Kubernetes Deployment Status
 
-The following services are currently deployed and running on a local **k3s** cluster.
+Deployed and verified on a local single-node **k3s** cluster:
 
-| Component | Type | Status | Replicas |
-|-----------|------|--------|----------|
-| gateway-service | Deployment | ✅ Running | 1/1 |
-| agent-service | Deployment | ✅ Running | 1/1 |
-| rag-service | Deployment | ✅ Running | 1/1 |
-| llm-service | Deployment | ✅ Running | 1/1 |
-| memory-service | Deployment | ✅ Running | 1/1 |
-| search-service | Deployment | ✅ Running | 1/1 |
-| weather-service | Deployment | ✅ Running | 1/1 |
-| ollama | StatefulSet | ✅ Running | 1/1 |
-| qdrant | StatefulSet | ✅ Running | 1/1 |
-| postgres-gateway | StatefulSet | ✅ Running | 1/1 |
-| postgres-memory | StatefulSet | ✅ Running | 1/1 |
-| redis-gateway | StatefulSet | ✅ Running | 1/1 |
-| redis-memory | StatefulSet | ✅ Running | 1/1 |
-| redis-search | StatefulSet | ✅ Running | 1/1 |
-| redis-weather | StatefulSet | ✅ Running | 1/1 |
-| prometheus | StatefulSet | ✅ Running | 1/1 |
-| grafana | Deployment | ✅ Running | 1/1 |
-| blackbox-exporter | Deployment | ✅ Running | 1/1 |
+|      Component      |            Type            |              Status               |
+|---------------------|----------------------------|-----------------------------------|
+| gateway-service     | Deployment                 | ✅ Running                        |
+| agent-service       | Deployment                 | ✅ Running                        |
+| rag-service         | Deployment                 | ✅ Running                        |
+| llm-service         | Deployment                 | ✅ Running                        |
+| memory-service      | Deployment                 | ✅ Running                        |
+| search-agent        | Deployment                 | ✅ Running                        |
+| weather-agent       | Deployment                 | ✅ Running                        |
+| ollama              | StatefulSet                | ✅ Running                        |
+| qdrant              | StatefulSet                | ✅ Running                        |
+| postgres-gateway    | StatefulSet                | ✅ Running                        |
+| postgres-memory     | StatefulSet                | ✅ Running                        |
+| redis-gateway       | StatefulSet                | ✅ Running                        |
+| redis-memory        | StatefulSet                | ✅ Running                        |
+| redis-search        | StatefulSet                | ✅ Running                        |
+| redis-weather       | StatefulSet                | ✅ Running                        |
+| prometheus          | StatefulSet                | ✅ Running                        |
+| grafana             | Deployment                 | ✅ Running                        |
+| blackbox-exporter   | Deployment                 | ✅ Running                        |
+| node-exporter       | DaemonSet                  | ✅ Running                        |
+| fluent-bit          | DaemonSet                  | ✅ Running                        |
 
-> **Current cluster status:** 18/18 workloads are healthy and running on Kubernetes (k3s).
+> **20/20 workloads healthy on Kubernetes (k3s).**
+
+---
 
 ## Roadmap
 
-### Phase 1 — Core Platform
+### Phase 1 — Core Platform ✅
 - [x] RAG Service
 - [x] LLM Service
-- [x] Docker Compose
 - [x] Memory Service
 - [x] Agent Service (LangGraph)
-- [x] Gateway Service
+- [x] Gateway Service (JWT auth, rate limiting, proxy)
+- [x] Docker Compose
 
-### Phase 2 — Domain Agents
+### Phase 2 — Domain Agents (in progress)
 - [x] Weather Agent
 - [x] Search Agent
 - [ ] Travel Agent
 - [ ] Finance Agent
 - [ ] News Agent
-
-### Phase 3 — Production
-- [ ] Auth Service (JWT + OAuth2)
-- [x] Kubernetes manifests (k3s)
-- [x] Prometheus + Grafana observability
-- [ ] gRPC inter-service communication
 - [ ] Calendar Agent
 - [ ] Maps Agent
 - [ ] Email Agent
+
+### Phase 3 — Production Hardening (in progress)
+- [x] Kubernetes manifests (k3s)
+- [x] Prometheus + Grafana observability
+- [x] DaemonSets — node-exporter, fluent-bit
+- [ ] gRPC inter-service communication
+- [ ] CI/CD (GitHub Actions)
+- [ ] OAuth2 social login
 
 ---
 
