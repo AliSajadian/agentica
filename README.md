@@ -74,13 +74,13 @@ agentica/
 
 ## Core Platform Services
 
-| Service | Port | Responsibility |
-|---|---|---|
-| gateway-service | 8000 | Single entry point, JWT auth, rate limiting, routing |
-| rag-service | 8001 | Document ingestion, chunking, embedding, vector search |
-| llm-service | 8002 | LLM inference, RAG-powered answer generation |
-| memory-service | 8003 | Conversation history, session state, agent handoff |
-| agent-service | 8004 | Multi-agent orchestration, task decomposition, LangGraph |
+| Service | Port | Responsibility | Status |
+|---|---|---|---|
+| gateway-service | 8000 | Single entry point, JWT auth, rate limiting, routing | ✅ Live |
+| rag-service | 8001 | Document ingestion, chunking, embedding, vector search | ✅ Live |
+| llm-service | 8002 | LLM inference, RAG-powered answer generation | ✅ Live |
+| memory-service | 8003 | Conversation history, session state, agent handoff | ✅ Live |
+| agent-service | 8004 | Multi-agent orchestration, task decomposition, LangGraph | ✅ Live |
 
 ## Domain Agent Services
 
@@ -97,21 +97,21 @@ agentica/
 
 ## Infrastructure & Observability
 
-| Service | Port | Responsibility |
-|---|---|---|
-| qdrant | 6333 | Vector database |
-| ollama | 11434 | Local LLM runtime (llama3.2:3b, CPU inference) |
-| postgres-gateway | 5432 | Users, refresh tokens |
-| postgres-memory | 5432 | Sessions, message history |
-| redis-gateway | 6379 | Rate limiting |
-| redis-memory | 6379 | Session cache |
-| redis-weather | 6379 | Weather response cache |
-| redis-search | 6379 | Search response cache |
-| prometheus | 9090 | Metrics collection |
-| grafana | 3000 | Metrics dashboards |
-| blackbox-exporter | 9115 | External endpoint probing |
-| node-exporter | 9100 | Per-node hardware metrics (DaemonSet) |
-| fluent-bit | 2020 | Cluster-wide log collection (DaemonSet) |
+| Service | Port | Responsibility | Status |
+|---|---|---|---|
+| qdrant | 6333 | Vector database | ✅ Live |
+| ollama | 11434 | Local LLM runtime (llama3.2:3b, CPU inference) | ✅ Live |
+| postgres-gateway | 5432 | Users, refresh tokens | ✅ Live |
+| postgres-memory | 5432 | Sessions, message history | ✅ Live |
+| redis-gateway | 6379 | Rate limiting | ✅ Live |
+| redis-memory | 6379 | Session cache | ✅ Live |
+| redis-weather | 6379 | Weather response cache | ✅ Live |
+| redis-search | 6379 | Search response cache | ✅ Live |
+| prometheus | 9090 | Metrics collection | ✅ Live |
+| grafana | 3000 | Metrics dashboards | ✅ Live |
+| blackbox-exporter | 9115 | External endpoint probing | ✅ Live |
+| node-exporter | 9100 | Per-node hardware metrics (DaemonSet) | Planned |
+| fluent-bit | 2020 | Cluster-wide log collection (DaemonSet) | ✅ Live |
 
 ---
 
