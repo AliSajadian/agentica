@@ -1,6 +1,4 @@
-Same fix as before — the tree/pipeline diagrams need to be wrapped in code fences, and the folder structure should reflect your actual `services/core/` + `services/agents/` split with the k8s subfolders. Here's the corrected full README:
-
-```markdown
+```
 # Agentica
 
 A production-grade agentic AI orchestration platform built with FastAPI, Ollama, and Qdrant.
