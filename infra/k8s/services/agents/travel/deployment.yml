@@ -1,53 +1,43 @@
 
-# Search Service Deployment
+# Travel Service Deployment
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: search-service-deploy
+  name: travel-service-deploy
   namespace: agentica-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: search-service
+      app: travel-service
   template:
     metadata:
       labels:
-        app: search-service
+        app: travel-service
     spec:
-      volumes:
-        - name: secrets
-          hostPath:
-            path: /home/ali/projects/AI/agentica/services/agents/search-agent/secrets
-            type: Directory
       containers:
-        - name: search-service
-          image: agentica-search-service:latest # Replace with your image
+        - name: travel-service
+          image: agentica-travel-service:latest # Replace with your image
           imagePullPolicy: Never
           ports:
             - name: http-api
-              containerPort: 8012 # Your FastAPI HTTP port
+              containerPort: 8010 # Your FastAPI HTTP port
             # - name: grpc-api
             #   containerPort: 50052 # Your gRPC port
           env:
             - name: APP_PORT
-              value: "8012"
-            - name: DUCKDUCKGO_BASE_URL
-              value: "https://api.duckduckgo.com"
+              value: "8010"
             - name: REDIS_HOST
-              value: "redis-search-svc.agentica-app.svc.cluster.local"
+              value: "redis-travel-svc.agentica-app.svc.cluster.local"
             - name: REDIS_PORT
               value: "6379"
             - name: REDIS_DB
-              value: "0"
+              value: "0"              
           envFrom:
             - configMapRef:
                 name: app-config
             - secretRef:
                 name: app-secrets
-          volumeMounts:
-            - name: secrets
-              mountPath: /home/ali/projects/AI/agentica/services/agents/search-agent/secrets
           resources:
             requests:
               memory: "64Mi"

@@ -1,0 +1,14 @@
+[MASTER]
+init-hook=
+    import sys;
+    paths = [
+        '/home/ali/projects/AI/agentica/services/core/rag-service',
+        '/home/ali/projects/AI/agentica/services/core/llm-service',
+        '/home/ali/projects/AI/agentica/services/core/memory-service',
+        '/home/ali/projects/AI/agentica/services/core/gateway-service',
+        '/home/ali/projects/AI/agentica/services/core/agent-service',
+        '/home/ali/projects/AI/agentica/services/agents/travel-agent',
+        '/home/ali/projects/AI/agentica/services/agents/weather-agent',
+        '/home/ali/projects/AI/agentica/services/agents/search-agent',
+    ];
+    [sys.path.insert(0, p) for p in paths]

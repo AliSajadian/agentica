@@ -1,0 +1,20 @@
+# Service for Travel Service (HTTP & gRPC)
+apiVersion: v1
+kind: Service
+metadata:
+  name: travel-service-svc
+  namespace: agentica-app
+spec:
+  selector:
+    app: travel-service
+  ports:
+    - name: http-api
+      protocol: TCP
+      port: 8010 # Internal service port for HTTP
+      targetPort: 8010
+       # Container's HTTP port
+    # - name: grpc-api
+    #   protocol: TCP
+    #   port: 50052
+    #   targetPort: 50052
+  type: ClusterIP

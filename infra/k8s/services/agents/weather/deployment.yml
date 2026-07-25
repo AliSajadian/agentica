@@ -36,7 +36,7 @@ spec:
             - name: APP_PORT
               value: "8011"
             - name: REDIS_HOST
-              value: "redis-memory-svc.agentica-app.svc.cluster.local"
+              value: "redis-weather-svc.agentica-app.svc.cluster.local"
             - name: REDIS_PORT
               value: "6379"
             - name: REDIS_DB

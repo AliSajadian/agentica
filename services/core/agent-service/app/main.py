@@ -1,3 +1,4 @@
+# pylint: disable=import-outside-toplevel
 '''Main'''
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
@@ -42,7 +43,6 @@ async def health():
 
 
 import httpx
-from app.config import settings
 
 @app.get("/ready")
 async def ready():

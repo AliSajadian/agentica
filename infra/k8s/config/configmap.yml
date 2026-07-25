@@ -55,6 +55,7 @@ data:
   MEMORY_PORT: "8003"
   AGENT_PORT: "8004"
   GATEWAY_PORT: "8000"
+  TRAVEL_PORT: "8010"
   WEATHER_PORT: "8011"
   SEARCH_PORT: "8012"
 
@@ -108,6 +109,10 @@ data:
         static_configs:
           - targets: ["weather-service-svc:8011"]
 
+      - job_name: "travel-agent"
+        static_configs:
+          - targets: ["travel-service-svc:8011"]
+
       - job_name: "search-agent"
         static_configs:
           - targets: ["search-service-svc:8012"]
@@ -131,6 +136,7 @@ data:
             - http://memory-service-svc:8003/health
             - http://agent-service-svc:8004/health
             - http://weather-service-svc:8011/health
+            - http://travel-service-svc:8010/health
             - http://search-service-svc:8012/health
             - https://github.com    
         relabel_configs:

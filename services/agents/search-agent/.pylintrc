@@ -1,0 +1,2 @@
+[MASTER]
+init-hook='import sys; sys.path.insert(0, "/home/ali/projects/AI/agentica/services/agents/search-agent")'

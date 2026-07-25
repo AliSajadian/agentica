@@ -73,6 +73,21 @@ spec:
   storageClassName: standard
 
 ---
+# For Redis Travel
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-travel-pvc
+  namespace: agentica-app
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 200Mi
+  storageClassName: standard
+
+---
 # For Redis Weather
 apiVersion: v1
 kind: PersistentVolumeClaim

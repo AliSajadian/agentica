@@ -1,5 +1,9 @@
+'''
+Weather  service
+'''
 import json
 import redis.asyncio as aioredis
+
 from app.core.openweather import openweather_client
 from app.models.schemas import (
     WeatherResponse, WeatherRequest,

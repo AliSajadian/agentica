@@ -126,6 +126,22 @@ services:
       retries: 3
       start_period: 10s
 
+  redis-travel:
+    image: redis:7-alpine
+    container_name: agentica-travel-redis
+    ports:
+      - "6383:6379"
+    volumes:
+      - redis_travel_data:/data
+    networks:
+      - agentica_agentica-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
   # rabbitmq:
   #   image: rabbitmq:3-management-alpine
   #   container_name: agentica-rabbitmq
@@ -407,6 +423,32 @@ services:
 
   # ── Agents ─────────────────────────────────────────────────────────────────
 
+  travel-agent:
+    build:
+      context: ./services/agents/travel-agent
+      dockerfile: Dockerfile
+    container_name: agentica-travel-agent
+    ports:
+      - "8010:8010"
+    environment:
+      APP_ENV: development
+      APP_PORT: 8010
+      REDIS_HOST: redis-travel
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+      LOG_LEVEL: INFO
+    depends_on:
+      - redis-travel
+    networks:
+      - agentica_agentica-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8010/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+
   weather-agent:
     build:
       context: ./services/agents/weather-agent
@@ -420,7 +462,7 @@ services:
       OPENWEATHER_API_KEY: abcd
       REDIS_HOST: redis-weather
       REDIS_PORT: 6379
-      REDIS_DB: 2
+      REDIS_DB: 0
       LOG_LEVEL: INFO
     depends_on:
       - redis-weather
@@ -446,7 +488,7 @@ services:
       APP_PORT: 8012
       REDIS_HOST: redis-search
       REDIS_PORT: 6379
-      REDIS_DB: 3
+      REDIS_DB: 0
       LOG_LEVEL: INFO
     depends_on:
       - redis-search
@@ -471,6 +513,7 @@ volumes:
   qdrant_data:
   redis_memory_data:
   redis_gateway_data:
+  redis_travel_data:
   redis_weather_data:
   redis_search_data:
   # rabbitmq_data:
