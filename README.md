@@ -364,7 +364,7 @@ Deployed and verified on a local single-node **k3s** cluster:
 ### Phase 2 — Domain Agents (in progress)
 - [x] Weather Agent
 - [x] Search Agent
-- [ ] Travel Agent
+- [X] Travel Agent
 - [ ] Finance Agent
 - [ ] News Agent
 - [ ] Calendar Agent
