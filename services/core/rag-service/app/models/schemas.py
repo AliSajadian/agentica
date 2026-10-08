@@ -7,7 +7,7 @@ from enum import Enum
 
 class DocumentStatus(str, Enum):
     '''Document status enumerarion'''
-    PADDING = "pending"
+    PENDING = "pending"
     PROCESSING = "processing"
     COMPLETED = "completed"
     FAILED = "failed"

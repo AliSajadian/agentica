@@ -19,23 +19,19 @@ logger = get_logger(__name__)
 class QdrantService:
     '''Qdrant Service'''
     def __init__(self):
-        self.client = None
-        self.collection = settings.QDRANT_COLLECTION
-
-    def _get_client(self):
         self.client = AsyncQdrantClient(
             host=settings.QDRANT_HOST,
             port=settings.QDRANT_PORT,
         )
-        return self.client
+        self.collection = settings.QDRANT_COLLECTION
 
     async def init_collection(self, vector_size: int = 384):
         """Create collection if it doesn't exist."""
-        existing = await self._get_client().get_collections()
+        existing = await self.client.get_collections()
         names = [c.name for c in existing.collections]
 
         if self.collection not in names:
-            await self._get_client().create_collection(
+            await self.client.create_collection(
                 collection_name=self.collection,
                 vectors_config=VectorParams(
                     size=vector_size,
@@ -60,7 +56,7 @@ class QdrantService:
             for chunk, embedding in zip(chunks, embeddings)
         ]
 
-        await self._get_client().upsert(
+        await self.client.upsert(
             collection_name=self.collection,
             points=points
         )
@@ -71,7 +67,7 @@ class QdrantService:
         vector: list[float],
         top_k: int = 5,
         score_threshold: float = 0.5,
-        metadata_filter: dict = None
+        metadata_filter: dict[str, str] | None = None
     ) -> list[SearchResult]:
         """Search similar vectors."""
 
@@ -87,7 +83,7 @@ class QdrantService:
                 ]
             )
 
-        results = await self._get_client().query_points( # search
+        results = await self.client.query_points( # search
             collection_name=self.collection,
             query=vector,
             limit=top_k,
@@ -108,7 +104,7 @@ class QdrantService:
 
     async def delete_by_source(self, source: str):
         """Delete all chunks from a specific source."""
-        await self._get_client().delete(
+        await self.client.delete(
             collection_name=self.collection,
             points_selector=Filter(
                 must=[

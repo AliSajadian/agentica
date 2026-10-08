@@ -57,7 +57,7 @@ async def query(request: QueryRequest):
 async def _call_llm_service(question: str, context_chunks: list) -> str:
     """
     Calls llm-service /chat/rag endpoint with question and retrieved chunks.
-    Returns generated answer string.
+    Returns generated answer string or None on failure.
     """
     payload = {
         "question": question,
@@ -74,11 +74,24 @@ async def _call_llm_service(question: str, context_chunks: list) -> str:
         "system_prompt": None
     }
 
-    async with httpx.AsyncClient(timeout=120) as client:
-        response = await client.post(
-            f"{settings.LLM_SERVICE_URL}/api/v1/chat/rag",
-            json=payload
-        )
-        response.raise_for_status()
-        data = response.json()
-        return data["answer"]
+    try:
+        async with httpx.AsyncClient(timeout=120) as client:
+            response = await client.post(
+                f"{settings.LLM_SERVICE_URL}/api/v1/chat/rag",
+                json=payload
+            )
+            response.raise_for_status()
+            data = response.json()
+            answer = data.get("answer")
+            if not answer:
+                logger.warning("llm_service_empty_answer", response=data)
+            return answer
+    except httpx.TimeoutException:
+        logger.error("llm_service_timeout")
+        return "LLM service timed out. Please try again."
+    except httpx.HTTPStatusError as e:
+        logger.error("llm_service_http_error", status=e.response.status_code)
+        return "LLM service returned an error. Please try again."
+    except Exception as e:
+        logger.error("llm_service_call_failed", error=str(e))
+        return "LLM service call failed. Please try again."

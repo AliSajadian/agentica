@@ -6,9 +6,9 @@ from contextlib import asynccontextmanager
 from fastapi.responses import JSONResponse
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from app.config import settings
+from .config import settings
 from app.utils.logger import setup_logging, get_logger
-from app.api.v1 import chat, complete
+from .api.v1 import chat, complete
 from app.core.ollama import ollama_client
 
 logger = get_logger(__name__)
@@ -35,6 +35,7 @@ async def lifespan(fastapi_app: FastAPI):
         logger.info("ollama_connected", available_models=models)
 
     yield
+    await ollama_client.close()
     logger.info("llm_service_stopping")
 
 

@@ -2,7 +2,7 @@
 '''Ollama'''
 import httpx
 import json
-from app.config import settings
+from ..config import settings
 from app.utils.logger import get_logger
 from typing import AsyncGenerator
 
@@ -17,6 +17,7 @@ class OllamaClient:
         self.base_url = OLLAMA_BASE_URL
         self.model = settings.OLLAMA_MODEL
         self.timeout = settings.OLLAMA_TIMEOUT
+        self._client = httpx.AsyncClient(timeout=self.timeout)
 
     async def generate(self, prompt: str) -> str:
         """Single response generation — no streaming."""
@@ -126,7 +127,9 @@ class OllamaClient:
             data = response.json()
             return [m["name"] for m in data.get("models", [])]
 
-
+    async def close(self):
+        """Close the HTTP client."""
+        await self._client.aclose()
 # ── GPU alternative note ──────────────────────────────────────────────────────
 # Ollama automatically uses GPU if available (NVIDIA CUDA or Apple Metal)
 # On your Intel UHD 620, it runs on CPU automatically — no config needed
